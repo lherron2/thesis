@@ -1,0 +1,53 @@
+\documentclass[12pt]{report}
+
+% Load shared preamble
+\input{preamble}
+
+% Thesis-specific settings
+\usepackage[margin=1in]{geometry}
+
+\title{Generative Modeling in the Biomolecular Sciences}
+\author{Lukas Herron}
+\date{2026}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+% Chapter 1: Introduction (to be written)
+% \chapter{Introduction}
+% \input{src/ch1_intro}
+
+% Chapter 2: Diffusion Models Review
+% Set counter to 1 so this compiles as Chapter 2 while Ch1 intro is commented out
+\setcounter{chapter}{1}
+\chapter{A Comparison of Probabilistic Generative Frameworks for Molecular Simulations}
+\input{src/ch2_diffusion_review}
+
+% Chapter 3: DDPM-REMD
+\chapter{From Data to Noise to Data: Mixing Physics Across Temperatures with Generative AI}
+\input{src/ch3_ddpm_remd}
+
+% Chapter 4: Thermodynamic Maps
+\chapter{Inferring Phase Transitions and Critical Exponents from Limited Observations with Thermodynamic Maps}
+\input{src/ch4_thermodynamic_maps}
+
+% Chapter 5: DiffDock-Glide
+\chapter{DiffDock-Glide: A Hybrid Physics-Based and Data-Driven Approach to Molecular Docking}
+\input{src/ch5_diffdock_glide}
+
+% Chapter 6: RNAnneal
+\chapter{Ab Initio Prediction of RNA Structure Ensembles with RNAnneal}
+\input{src/ch6_rnaanneal}
+
+% Chapter 7: Outlook (to be written)
+% \chapter{Outlook}
+% \input{src/ch7_outlook}
+
+% Bibliography
+\bibliographystyle{unsrt}
+\bibliography{bib/thesis}
+
+\end{document}
