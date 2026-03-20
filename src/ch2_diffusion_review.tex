@@ -282,7 +282,7 @@ The category of discrete normalizing flows to which Neural Spline Flows belong i
 Details of the Aib\textsubscript{9} molecular dynamics simulation are provided in Table 1. The Gaussian mixture model data was generated via \texttt{torch.distributions}. This package enables sampling from Gaussian distributions of arbitrary dimensionality with given mean vectors and covariance matrices. In our usage, covariance matrices are the identity matrix, and mean vectors are drawn randomly. To generate multimodal Gaussian mixtures, we draw samples from independent Gaussian distributions and combine them. The ratio of samples from one distribution versus another can be varied, allowing a controllable degree of asymmetry for our free energy difference estimation experiment.
 
 As noted in Section \ref{ch2:sec:availability}, all code to perform data generation (GMM and Aib\textsubscript{9} datasets) is available at \url{https://github.com/tiwarylab/model-comparison}, and the datasets are additionally located on \href{https://zenodo.org/records/14679134?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjAyYmYzODhlLWE2ZjYtNDA4NS1iNDhlLTJlNzZmMzcyNzMwZCIsImRhdGEiOnt9LCJyYW5kb20iOiI0YTE3NTE3N2Y4MThkODg0YTY4NTI4OWExMGE3NmNmNiJ9.HcFgvUV0sK8EhJm0Ow8cFn-56q8rGuSWj_LBQIcpzMZ_mAySqnJ4pJeJubxw_3Dtl2chUoHAGOaxgaRFyZRLWg}{Zenodo}.
-\begin{table}[h!]
+\begin{table}[htbp]
 \centering
 \begin{tabular}{|c|c|}
 \hline
@@ -300,6 +300,7 @@ Production run & 200 ns \\
 \end{tabular}
 \vspace{10pt} 
 \caption{Aib\textsubscript{9} MD parameters}
+\label{ch2:tab:aib9-md}
 \end{table}
 
 \end{subappendices}
