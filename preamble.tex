@@ -1,0 +1,125 @@
+% preamble.tex - Shared macros and packages for thesis
+% Generated during preprocessing
+
+%% ========================================
+%% PACKAGES
+%% ========================================
+
+% Encoding and fonts
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Math
+\usepackage{amsmath,amssymb}
+\usepackage{bm}  % Bold math symbols
+
+% Graphics - with compression settings
+\usepackage{graphicx}
+\usepackage{grffile}  % Extended file name support
+
+% Compress images in PDF output
+\pdfcompresslevel=9
+\pdfobjcompresslevel=3
+
+% Tables
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{tabularx}
+
+% Figures
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{capt-of}
+
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% Colors and hyperlinks
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{url}
+
+% Bibliography
+\usepackage{natbib}
+
+% Appendix
+\usepackage{appendix}
+
+% Misc
+\usepackage{textcomp}
+\usepackage{comment}
+\usepackage{microtype}
+
+%% ========================================
+%% EDITOR NOTE MACROS (disabled for thesis)
+%% ========================================
+% These were used during paper writing for author comments
+% Redefined to simply output the text without color
+
+\newcommand{\lh}[1]{#1}   % Lukas Herron
+\newcommand{\pt}[1]{#1}   % Pratyush Tiwary
+\newcommand{\rj}[1]{#1}   % Richard John
+\newcommand{\yh}[1]{#1}   % Yihang Wang
+\newcommand{\jd}[1]{#1}   % Jumana Dakka
+\newcommand{\sj}[1]{#1}   % Steven Jerome
+\newcommand{\slee}[1]{#1} % Suemin Lee
+\newcommand{\ryw}[1]{#1}  %
+
+%% ========================================
+%% UTILITY MACROS
+%% ========================================
+
+% Citation helper (if needed for compatibility)
+% \newcommand{\onlinecite}[1]{\hspace{-1 ex} \nocite{#1}\citenum{#1}}
+
+% Tilde rendering
+\newcommand{\mytexttilde}{\raisebox{0.5ex}{\texttildelow}}
+
+% Table helpers
+\newcommand{\head}[1]{\textnormal{\textbf{#1}}}
+\newcommand{\normal}[1]{\multicolumn{1}{l}{#1}}
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+
+% Equation numbering helper
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+%% ========================================
+%% ALGORITHM FORMATTING
+%% ========================================
+% From thermodynamic-maps-pnas
+
+\newlength\myindent
+\setlength\myindent{5em}
+
+\newcommand\bindent{%
+  \begingroup
+  \setlength{\itemindent}{\myindent}
+  \addtolength{\algorithmicindent}{\myindent}
+}
+\newcommand\eindent{\endgroup}
+
+\newcommand{\INDSTATE}[1][1]{\State\hspace{#1\algorithmicindent}}
+
+%% ========================================
+%% MACRO CONFLICTS RESOLVED
+%% ========================================
+% \lh defined differently across papers:
+%   diffusion-review-jcp: \newcommand{\lh}[1]{{\color{red}{#1}}}
+%   ddpm-rmsd-pnas: \newcommand{\lh}{\textcolor{blue}}
+%   thermodynamic-maps-pnas: \newcommand{\lh}{\color{red}}
+%   diffdock-glide: \newcommand{\lh}[1]{{\color{blue}{#1}}}
+%   rnanneal: \newcommand{\lh}[1]{{\color{red}{#1}}}
+% RESOLVED: All converted to no-op identity function
+
+% \pt defined differently across papers:
+%   Similar pattern to \lh
+% RESOLVED: All converted to no-op identity function
+
+%% ========================================
+%% END PREAMBLE
+%% ========================================
