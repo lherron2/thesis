@@ -159,9 +159,9 @@ One may further desire a transport process capable of mapping samples between ar
 
 Having examined the different flavors of probabilistic generative models, we turn now to numerical experiments to compare performance across two separate datasets. NS is an example of a normalizable architecture (Section \ref{ch2:sec:normalizing-flows}), CFM is a continuous flow model (Section \ref{ch2:sec:neural-ode}) which solves a user-selected bridge problem (Section \ref{ch2:sec:sbm}), in this case obeying the optimal transport solution between the target and prior distributions, and DDPM represents the broad diffusion model class (Section \ref{ch2:sec:sgm}). To compare the training, sampling, and accuracy of the NS, CFM, and DDPM models, we perform experiments on two datasets - a Gaussian mixture model in spaces of varying dimensionality and the dihedral torsion angle distribution associated with an Aib\textsubscript{9} molecular dynamics simulation in water (see Appendix \ref{ch2:sec:data-details} for GMM data generation procedure and Aib\textsubscript{9} simulation details). We collected information on all configurational coordinates for the Gaussian mixture model, while for Aib\textsubscript{9} we collected information on all 9 $\{\Phi, \Psi\}$ pairs of dihedral angles. To quantify the accuracy of a given model, we begin by performing principal component analysis on the training data. After conducting training, generated samples are projected along the two principal components of the training data. This data projection is binned, and KL divergence is computed between vectors enumerating the counts in the corresponding bins.
 
-\begin{figure}[hb]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.4\textwidth]{figures/ch2_panel_gmm_main.jpg}
+    \includegraphics[width=0.6\textwidth]{figures/ch2_panel_gmm_main.jpg}
     \caption{\textbf{Model accuracy results for the 4-modal Gaussian mixture dataset.} a) KL divergence ($D_{KL}$) comparison with analytical benchmark as a function of dimensionality. b) KL divergence comparison as a function of training dataset size at a fixed dimensionality of 50.}
     \label{ch2:fig:panel gmm main}
 \end{figure}
@@ -188,9 +188,9 @@ The first numerical experiment we perform concerns a Gaussian mixture, a superpo
 
 Our next GMM experiment considers varying the amount of training data the model sees and measuring model accuracy. In this test, the dimensionality is fixed at 50, and we consider a Gaussian mixture with four modes. Figure \ref{ch2:fig:panel gmm main}b shows that KL divergence as a function of training dataset size varies logarithmically for all three models, and DDPM fares better than NS and CFM for low amounts of training data.
 
-\begin{figure}[hb]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.4\textwidth]{figures/ch2_panel_gmm_modes.jpg}
+    \includegraphics[width=0.6\textwidth]{figures/ch2_panel_gmm_modes.jpg}
     \caption{\textbf{Model accuracy results for the 50-dimensional Gaussian mixture dataset.} KL divergence ($D_{KL}$) comparison with analytical benchmark as a function of \rj{number of modes.}}
     \label{ch2:fig:panel gmm modes}
 \end{figure}
@@ -203,18 +203,18 @@ The fourth experiment performed on the Gaussian mixture dataset examines the abi
 
 Figure \ref{ch2:fig:panel asym} shows the accuracy results and the coefficient of determination $r^2$ for each model compared to the training free energy difference. We conclude that NS reproduces the training free energy differences the most faithfully, followed by CFM and DDPM. It is useful to note that the least accurate model by KL divergence in our principal GMM dimensionality test outperforms the other two in this case.
 
-\begin{figure}[ht]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.4\textwidth]{figures/ch2_panel_asym.jpg}
+    \includegraphics[width=0.6\textwidth]{figures/ch2_panel_asym.jpg}
     \caption{\textbf{Free energy difference estimation accuracy on asymmetric bimodal distributions.} A free energy difference of zero represents two equal Gaussian modes, while higher free energy indicates a higher level of asymmetry. $r^2$ is computed with the residuals of each model from the plotted line indicating training free energy difference. We impose a free energy cutoff of 0.0374 kJ/mol and note the data dimensionality is fixed at 50.}
     \label{ch2:fig:panel asym}
 \end{figure}
 
 Our final two GMM experiments concern sampling speed and model capacity, both measured as dimensionality varies for a Gaussian mixture with four modes. As shown in Figure \ref{ch2:fig:panel gmm si}a, CFM displays much faster inference than DDPM or NS. Computing the likelihood associated with a given sample is also useful in many statistical mechanics tasks. The NS architecture conveniently passes likelihoods through the same series of invertible transformations as samples, and thus, the cost of likelihood estimation is included in this experiment. In contrast, DDPM and CFM require additional probability flow ODE simulations to produce likelihoods at approximately double the cost as inference for samples alone \cite{score-based-generative}. As such, this separate process is not accounted for here, although it would not change CFM’s superior speed ranking. Figure \ref{ch2:fig:panel gmm si}b shows the results of the model capacity measurement. CFM and DDPM employ the same predictive neural network, so their model capacity is equal. In contrast, the NS network is initially less expensive but increases rapidly in size as dimensionality climbs.
 
-\begin{figure}[ht]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.4\textwidth]{figures/ch2_panel_gmm_si.jpg}
+    \includegraphics[width=0.7\textwidth]{figures/ch2_panel_gmm_si.jpg}
     \caption{\textbf{Speed and model size results for the 4-modal Gaussian mixture dataset.} a) Single sample generation time comparison as a function of dimensionality. b) Model capacity comparison measured by total number of learnable parameters as a function of dimensionality.}
     \label{ch2:fig:panel gmm si}
 \end{figure}
@@ -226,9 +226,9 @@ The previous example has a limit of four modes in the underlying probability dis
 
 The `exterior' residues closest to the end of the peptide chain, residues 1 and 9, for example, are more flexible and thus more rapidly transition between left and right-handed orientations, sampling more of the transition states and other high-energy regions. These residues thus have a more complex distribution than the middle residues, which exhibit slower transitions \cite{aib9-residues}. This behavior can be seen in the U-shaped curve of KL divergence scores, indicating the higher difficulty the models face in generating the exterior residues.
 
-\begin{figure*}[ht]
+\begin{figure*}[htbp]
     \centering
-    \includegraphics[width=1\textwidth]{figures/ch2_panel_aib9.jpg}
+    \includegraphics[width=\textwidth]{figures/ch2_panel_aib9.jpg}
     \caption{\textbf{Model accuracy results and generated data for the Aib\textsubscript{9} peptide.} a) KLD performance comparison as a function of residue index for the complete Aib\textsubscript{9} torsion angle dataset. b) KLD performance comparison for the three models and Gaussian baseline fit as a function of training dataset size for the Aib\textsubscript{9} torsion angle data distribution at residue 5. c) d) e) f) $\{ \Phi,\Psi \}$ show free energy contour plots for torsion angle distributions at residue 1 for training data and generated data for NS, CFM, and DDPM, respectively.}
     \label{ch2:fig:panel aib9}
 \end{figure*}
@@ -269,9 +269,9 @@ Initially, we set Conditional Flow Matching to use a Multi-Layer Perceptron (MLP
 
 The category of discrete normalizing flows to which Neural Spline Flows belong is perhaps the largest, containing any invertible transformation (or series thereof) between the base and target distributions. We initially implemented real-valued non-volume preserving normalizing flows (Real NVP) but opted to change to NS flows for a more recent model known for its series of expressive rational quadratic spline transformations, which serve as the affine or additive transformations in coupling layers. As a normalizing flow, NS is trained by maximizing the total log-likelihood of the training data. This objective guides learning the spline parameters at each discrete node, parameterized by the ResMADE (Residual Masked Autoencoder for Distribution Estimation) architecture. We opt to tune the `layers' parameter, a proxy for the depth of the model. The original NS base code is available at \url{https://github.com/bayesiains/nsf}. However, we used the \texttt{normalizing-flows} repository, a valuable collection of several normalizing flows models, available at \url{https://github.com/VincentStimper/normalizing-flows}.
 
-\begin{figure*}[t]
+\begin{figure*}[htbp]
     \centering
-    \includegraphics[width=.9\textwidth]{figures/ch2_panel_tuning.jpg}
+    \includegraphics[width=\textwidth]{figures/ch2_panel_tuning.jpg}
     \caption{\textbf{Hyperparameter tuning for each model.} a) Tuning of the `layers' parameter of NS. b) c) Tuning of the `model dimension' parameter of CFM and DDPM respectively.} 
     \label{ch2:fig:panel tuning}
 \end{figure*}
