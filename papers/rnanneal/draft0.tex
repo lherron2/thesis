@@ -1,0 +1,166 @@
+\documentclass[%
+ aip,
+% jmp,
+% bmf,
+% sd,
+% rsi,
+ amsmath,amssymb,
+%preprint,%
+ reprint,%
+%author-year,%
+%author-numerical,%
+% Conference Proceedings
+]{revtex4-1}
+%\usepackage[letterpaper,total={6.5in,8.5in},headheight=0pt]{geometry}
+\usepackage[utf8]{inputenc}
+% \usepackage{caption}
+% \usepackage{subcaption}
+\usepackage{comment}
+\usepackage{bbm}
+% \captionsetup{font={bf,small},skip=0.25\baselineskip}
+% % \captionsetup[subfigure]{font={bf,small}, skip=1pt, singlelinecheck=false}
+% \captionsetup[figure]{labelfont=bf,textfont=normalfont}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath,bm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{xr}
+%\usepackage{cite}
+\usepackage{url}
+\usepackage{hyperref}
+%\newcommand{\onlinecite}[1]{\hspace{-1 ex} \nocite{#1}\citenum{#1}}
+\usepackage[margin=1in]{geometry}
+\bibliographystyle{apsrev4-2}
+
+\newcommand{\lh}[1]{{\color{red}{#1}}}
+\newcommand{\pt}[1]{{\color{red}{#1}}}
+
+\begin{document}
+
+\title{Finding needles in haystacks: virtual screening RNA structural ensembles with ab initio deep learning}
+
+\author{Lukas Herron}
+\affiliation{Biophysics Program and Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA}
+\affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA.}
+\author{Pratyush Tiwary}
+\thanks{Corresponding author: ptiwary@umd.edu}
+\affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA.}
+\affiliation{Department of Chemistry and Biochemistry and Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA.}
+
+\begin{abstract}
+    TBD
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+\begin{itemize}
+    \item 
+
+\item \lh{The starting point of the paper should be structure prediction + virtual screening}
+
+\item \lh{What is the main problem that virtual screening solves}
+
+\item \lh{Structure generation without evaluation is missing half the problem}
+
+\end{itemize}
+
+Structure prediction is a longstanding goal of computational biology. It aims to predict the structure of bio-polymers given their amino-acid and nucleotide sequences.
+
+\subsection{Homology and ab initio structure prediction}
+
+\subsubsection{Ab initio and homology modeling}
+Traditional approaches to structure prediction are numerous and can be placed on a spectrum spanning from {\it ab initio} to homology methods. 
+
+The ab initio approach (sometimes called de novo modeling) models molecular structure using first principles from chemistry and physics. Ab initio structure prediction explores the conformational landscape using knowledge-based energy functions and Monte-Carlo or molecular dynamics sampling. Ideally, experimentally solved structures are minima of the energy landscape, and so the energy may be used to evaluate the quality of sampled models.
+
+At the other end of the spectrum homology (or comparative) modeling uses observed relationships between solved sequence-structure pairs to infer the structure of a target sequence. The predictive relationships are usually evolutionary in nature: since tertiary structure is more conserved than the primary sequence, it may often be assumed that sequence similarity translates to structural similarity.
+
+Ab initio and homology methods have distinct limitations. Methods of the former class are accurate but are slow to converge when the conformational search space is large, while methods of the latter class are limited by the quality and quantity of available data.
+
+As a result, the most successful approaches to structure prediction use methods from both classes. Programs like MODELLER and Prime primarily use homology-based methods for model prediction, but still use ab initio methods to model unstructured regions. On the other hand, primarily ab initio methods like Rosetta and FARFAR2 benefit from the use of structure templates to narrow the conformational search space.
+
+\subsubsection{Homology-inspired deep learning}
+
+The deep-learning revolution in biomolecular structure prediction was initiated by AlphaFold2 (AF2) -- an artificial intelligence system trained on co-evolutionary information and protein structures deposited in the Protein Data Bank (PDB). Arguably, one of the most important contributions of AF2 was the use of deep-learning architectures originating from the field of natural language processing to infer relationships between sequence alignments and structure templates.
+
+
+
+\subsubsection{Ab initio deep learning}
+
+Ab initio deep learning incorporates first principles ideas from physics and chemistry and relies minimally on evolutionary data. Some of the earliest ab initio deep-learning methods were for the objective of enhancing sampling in molecular simulations. These methods are firmly rooted in physical chemistry and integrate (mesh?) with physics-based simulators (MD + MCMC).
+
+SPIB and VAMPnets identify slow processes to accelerate during molecular simulations; thermodynamic maps reweight simulation data across environmental conditions; Boltzmann generators sample the equilibrium distribution; machine-learning force fields predict energies and forces without explicitly carrying out expensive electronic structure calculations. Despite the wide range of applications and approaches, the common thread is that ab initio deep learning is trained exclusively on data generated by physics-based simulation.
+
+Much like the trajectory of the field of traditional structure prediction methods, the deep-learning field is converging to methods that use of both homology and ab initio modeling, like AF2RAVE.
+
+% Approaches to structure prediction are numerous and can be placed on a spectrum spanning from {\it ab initio} methods at one end that explicitly account for the physical and chemical interactions that influence structure formation, to {\it data-driven} methods at the other end that make use of existing co-evolutionary and structural data.
+
+% At the fully {\it ab initio} extreme lie methods that use molecular dynamics and Monte-Carlo simulations to fold a sequence initialized as an unfolded chain. At the other extreme lie neural networks trained to generate folded structures from the sequence string by training on known sequence-structure pairs. 
+
+% Ab inito and data-driven methods have complementary strengths and weaknesses: ab inito methods generalize to novel sequences but often fail to find a well-folded structure when the search space is too large, while data-driven methods are capable of producing correct, well-folded structures for relatively long sequences, but only if similar sequences are present in the training data.
+
+% % Most methods lie somewhere between these extremes. Homology models, for example, use sequence alignments and known structures to reduce the search space of {\it ab initio} simulations, and neural network architectures and inference algorithms often include molecular inductive biases.
+
+\subsection{Considerations for evaluating ensembles of models}
+
+\subsubsection{The sequence-to-structure relationship is one-to-many}
+
+Current AI structure prediction algorithms primarily operate in the one-structure-per-sequence paradigm, and yet biology does not operate on static structures. Many biomolecules are highly dynamic entities that frequently transition between distinct structures to carry out their functions. The set of structures a biomolecule occupies is its {\it conformational ensemble}, and the appropriate granularity of the ensemble depends on the function being described. 
+
+The Boltzmann-weighted conformational ensemble is of principal interest to theoretical chemists and structural biologists alike. It is the usual conformational ensemble but with the Boltzmann weight, i.e. the abundance, attached to each conformer.
+
+Sometimes the conformers in the ensemble differ only slightly, e.g. the ``in'' and ``out'' conformations of the DFG motif that dictate the active and inactive state of a kinase. Other times the conformational ensemble is highly heterogeneous: long non-coding RNAs exhibit high structural diversity and regulate many cellular processes simultaneously. The conformational ensemble may be evenly weighted, showing little preference for a particular conformer, or it may contain rare conformations, like the so-called ``invisible'' conformations of the HIV-TAR RNA involved in small-molecule binding. And, to make matters even more complicated, the composition of the ensemble is dependent on the state of the environment.
+
+As one progresses from single structures to conformational ensembles and finally Boltzmann-weighted conformational ensembles that amount available data decreases. Sequences with multiple solved structures are relatively uncommon, and with their abundances even more so. This poses a problem for AI approaches to structure prediction that require large amounts of data to train on, but not for {\it ab initio} methods that explicitly model the energy, from which the Boltzmann weight is computed.
+
+\subsection{Structure generation and evaluation}
+
+One of the questions raised in the CASP15 structure prediction competition is how predictions ought to be evaluated when the ground truth is a conformational ensemble. We propose that evaluation metrics usually used to quantify success in small-molecule virtual screening are suitable. In particular, we use the Boltzmann-enhanced discrimination of receiver operator characteristic (BEDROC) to quantify the tendency of a scoring function to rank experimental structures more highly than decoys.
+
+\subsection{Virtual screening treats scoring functions as classifiers}
+
+\begin{itemize}
+    \item The most accurate classifier assigns each sample its Boltzmann weight. However, obtaining said weights through computational means is rarely a simple task. Still, one can ask how accurate approximations to the  
+    \item The classification task is to separate real data (structures) from decoys.
+    \item Note that the maximum possible enrichment is not necessarily correct! 
+    \item define the ``retrieval'' class
+\end{itemize}
+
+
+\subsubsection{Definition}
+
+A virtual screen uses a scoring function to discriminate between real and decoy data. The performance of the scoring function is quantified by the enrichment, which measures the concentration of real samples in a subset of the top-ranked data. 
+
+\subsubsection{Small-molecule example}
+
+Virtual screens are often carried out in a drug discovery setting, where one uses molecular docking algorithms and scoring functions to rank large libraries of compounds according to their binding affinity to a target receptor. Afterwards the highest ranked compounds are purchased and their binding affinity is measured experimentally.
+
+\subsubsection{The early recognition problem}
+
+The proper evaluation metric for quantifying enrichment in a virtual screen has been subject of debate. Two commonly used, longstanding metrics are the enrichment factor ($EF_\chi$) which measures the ratio of the concentration of real data in the top $\chi\%$ of rankings relative to the concentration over the entire list, and the area under the accumulation curve ($AUAC$) which measures departure from random ordering.
+
+However, both $EF_\chi$ and AUAC do not address the early recognition problem \cite{truncheon}. Briefly, the problem is that virtual screening typically involves scoring large numbers of samples, but typically only the highest-scoring (say, in the top $\chi\%$) will be used for downstream tasks. For example, a small molecule virtual screen of billions of compounds may result in only the top 100 compounds being purchased for experimental validation. The same problem is faced when screening RNA structures: only a small number may be used for downstream tasks like molecular docking or rational drug design.
+
+The early recognition problem identifies that the concentration of real data among the highest ranks must be emphasized when evaluating the results of a virtual screen. Ref.\cite{truncheon} introduces the Boltzmann-enhanced discrimination of reciever operator characteristic (BEDROC) metric by placing an exponential weight $e^{-\alpha r}$ on the rank $r$ when computing the AUAC. Intuitively, BEDROC emphasizes the contribution of areas towards the top of the list and attenuates those further down.
+
+\subsection{Decoy generation}
+
+Prior to virtual screening in a production setting, the scoring function is customarily benchmarked on known real and decoy data. It is important that the decoy data is not trivially distinguishable from real data. For small molecules a benchmark dataset like DUDE contains decoy compounds that have similar pharmacokinetic properties to known active compounds but dissimilar topologies\cite{dude}.
+
+We use {\it ab initio} modeling to generate decoy RNA structures. First two secondary structure prediction softwares -- Eternafold and LinearFold --are used to predict an ensemble of secondary structures. Then, each secondary structures is assembled into an all-atom tertiary structure using FARFAR2. Likewise the native structure is minimized under the FARFAR2 energy function.
+
+\subsection{Ensembles of ab initio deep learning models enhance the classification power of RNA force fields}
+
+\section{Results}
+
+\subsection{Enrichment on riboswitch and CASP15 RNA sets}
+
+\subsection{Comparison with Rosetta, 3dRNA, ARES}
+
+\section{Materials and Methods}
+
+\end{document}

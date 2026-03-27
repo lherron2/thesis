@@ -1,0 +1,1327 @@
+\documentclass[%
+aip,
+% jmp,
+% bmf,
+% sd,
+% rsi,
+ amsmath,amssymb,
+% preprint,%
+reprint,%
+twocolumn,
+%author-year,%
+%author-numerical,%
+% Conference Proceedings
+]{revtex4-1}
+%\usepackage[letterpaper,total={6.5in,8.5in},headheight=0pt]{geometry}
+\usepackage[utf8]{inputenc}
+% \usepackage{caption}
+% \usepackage{subcaption}
+\usepackage{comment}
+\usepackage{bbm}
+\usepackage{titlesec}
+\makeatletter
+\newcommand\setcurrentname[1]{\def\@currentlabelname{#1}}
+\makeatother
+\usepackage{lipsum}
+\usepackage{algorithm2e}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+
+\usepackage{booktabs}   % in your preamble
+\usepackage{tabularx}
+% \captionsetup{font={bf,small},skip=0.25\baselineskip}
+% % \captionsetup[subfigure]{font={bf,small}, skip=1pt, singlelinecheck=false}
+% \captionsetup[figure]{labelfont=bf,textfont=normalfont}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath,bm}
+\usepackage{natbib}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{xr}
+%\usepackage{cite}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{nameref}
+\usepackage{makecell}
+
+%\newcommand{\onlinecite}[1]{\hspace{-1 ex} \nocite{#1}\citenum{#1}}
+\usepackage[margin=0.75in]{geometry}
+\bibliographystyle{apsrev4-2}
+
+\newcommand{\lh}[1]{{\color{red}{#1}}}
+\newcommand{\pt}[1]{{\color{magenta}{#1}}}
+\newcommand{\mytexttilde}{\raisebox{0.5ex}{\texttildelow}}
+\begin{document}
+
+\title{\textrm{\textbf{\textit{Ab initio}}} prediction of RNA structure ensembles with RNAnneal}
+
+\author{Lukas Herron}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Biophysics Program, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA\looseness=-1}
+\author{Yunrui Qiu}
+\thanks{These authors contributed equally to this work.}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA\looseness=-1}
+\author{Anjali Verma} 
+\thanks{These authors contributed equally to this work.}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Biophysics Program, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\author{Venkata Sai Sreyas Adury}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Chemical Physics Program, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\author{Richard John}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Department of Physics, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\author{Suemin Lee}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Biophysics Program, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA\looseness=-1}
+\author{Shams Mehdi}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Biophysics Program, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\author{Disha Sanwal}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{Department of Chemistry and Biochemistry, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\author{John S. Schneekloth Jr.}
+\affiliation{Chemical Biology Laboratory, National Cancer Institute, Frederick, MD 21702, USA\looseness=-1}
+\author{Pratyush Tiwary}
+\thanks{Corresponding author: ptiwary@umd.edu}
+\affiliation{Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+\affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA\looseness=-1}
+\affiliation{Department of Chemistry and Biochemistry, University of Maryland, College Park, MD, 20742, USA\looseness=-1}
+% \affiliation{University of Maryland Institute for Health Computing, Bethesda, MD, 20852, USA.}
+% \affiliation{Department of Chemistry and Biochemistry and Institute for Physical Science and Technology, University of Maryland, College Park, MD, 20742, USA.}
+
+\begin{abstract}
+RNA utilizes three-dimensional structure in addition to sequence to carry out diverse functions in gene expression and disease. Much like well-folded proteins, RNAs adopt specific three-dimensional structures to carry out their function. Yet comparatively few RNA structures have been solved by atomic resolution structural techniques, in part because unlike structured proteins, RNAs fold into heterogeneous ensembles of interconverting structures that pose a challenge for high-resolution structure probing methods. In this work, we introduce RNAnneal as a method for RNA structural ensemble prediction that seamlessly integrates generative deep learning with statistical physics and molecular dynamics modeling. Given the primary sequence, RNAnneal uses {\it ab initio} (i.e., first principles) modeling to sample an ensemble of 3D structures, which, in turn, are used to train an ensemble of unsupervised deep learning models. The RNAnneal score, representing the consensus of the deep learning models, is then used to evaluate the 3D structures. We evaluated RNAnneal structures against 16 experimentally-resolved conformations (ERCs) of riboswitch RNAs and found that pseudoknot-free (PK-free) ERCs were well-reproduced by RNAnneal, with clear avenues for improving performance even on PK-comprising structures. Furthermore, we found that the RNAnneal score outperforms the Rosetta score and a state-of-the-art RNA forcefield on the task of classifying ERCs from decoys. We then introduce the interaction entropy as a measure of conformational heterogeneity within an ensemble and use it to assess our predictions. RNAnneal thus provides a generalizable framework for predicting RNA structural ensembles that will accelerate RNA-targeted drug discovery and the design of functional RNA molecules.
+
+\end{abstract}
+
+\maketitle
+
+% \section{Introduction}
+
+RNA was discovered to be the messenger of genetic information, carrying the code for polypeptide sequences from the nucleus to the ribosome, in 1961.\cite{brenner1961unstable} Six decades later, our understanding of RNA has expanded to include noncoding, molecular recognition, and enzymatic functions, establishing the transcriptome as a complex web of functional, interacting RNA molecules that orchestrate gene expression and disease at multiple levels.\cite{wan2011understanding} Interrogation of the transcriptome continues to yield insights that are critical for understanding basic biology and designing next-generation therapeutics.\cite{saw2024advancements,childs2022targeting} The approval of small molecules such as risdiplam\cite{ratni2018discovery} and successes of mRNA vaccines\cite{pardi2018mrna,jackson2020mrna} highlight the role of RNA as both a target and therapeutic modality.
+
+Understanding how RNA sequence gives rise to three-dimensional structure and function remains a frontier for theoretical and computational science. Accurate structure models would inform decision making in RNA therapeutic development in a similar manner to proteins, where atomic resolution structure models are frequently considered when evaluating the therapeutic potential of protein targets. These models, however, are rarely available for RNAs. To illustrate, approximately 100 RNA-only structures are deposited in the Protein Data Bank (PDB) annually compared to 10,000 for proteins.\cite{berman2000protein} Furthermore, most PDB entries are solved by high-resolution methods like nuclear magnetic resonance spectroscopy (NMR), X-ray crystallography, or cryo-electron microscopy. These methods operate by detecting an average signal from the conformational ensemble to generate a structural model, and are therefore most accurate when the ensemble is homogeneous. In the case of less ordered structures, the detector receives a superposition of the individual conformations' signals that can be difficult to deconvolve. The structural heterogeneity of RNAs therefore presents a severe limitation to such ensemble averaged methods. New experimental and computational methods are required to accurately characterize such heterogeneous conformational ensembles.\cite{morandi2021genome,ding2023visualizing,bowman2024alphafold} Here, we introduce RNAnneal as a computational method for predicting RNA structural ensembles. RNAnneal integrates modeling principles from generative deep learning, statistical physics, and molecular simulations into an {\it ab initio }conformational sampler and a deep learning score model.
+
+\begin{figure*}[ht!]
+    \centering
+    \includegraphics[
+    width=1\textwidth
+    ]{./schematic-1.png}
+    \caption{{\bf Illustrative overview of RNAnneal.} {\bf a.} The conformational sampling component of RNAnneal is illustrated. Starting with the primary sequence, a large number of secondary and 3D structures are predicted in succession. The 3D conformations are clustered into representatives before each is simulated for 100ns using implicit solvent molecular dynamics. Together, the simulation frames form a set of diverse candidate conformations that will be scored by RNAnneal. {\bf b.} Energetic features (upper track) and latent representations (lower track) are extracted from each conformation. The latent features are constructed by projecting geometric descriptors (G- and R-vectors) into a reduced space of dimension $d$ using Principal Component Analysis (PCA) and a State Predictive Information Bottleneck (SPIB) model. {\bf c.} The structure of a thermodynamic map\cite{herron2024inferring} (TM) is illustrated: latent representations, $\mathbf{x}_0$ are mapped onto an energy-dependent prior distribution, while the energies, $U_0$ themselves are mapped onto a unit normal distribution. {\bf d.} TM models are trained on geometric features of dimension $d$ produced by PCA and SPIB. The RNAnneal score is derived from the log-likelihood of the candidate conformations under the models. {\bf e.} The RNAnneal score is suited for the task of classifying experimentally resolved conformations (ERCs) from decoys.}
+    \label{fig:schematic}%
+\end{figure*}
+
+% \lh{Introduce ERC classifications RMSD and INF early on -- talk about why both are needed. Large changes in RMSD can correspond to minor changes in the interaction network. RMSD leq 5; INF geq 0.85.}
+
+\subsection*{RNAnneal}
+RNAnneal is an unsupervised, {\it ab initio} method for predicting RNA structural ensembles that integrates generative deep learning with statistical physics and Molecular Dynamics (MD). RNAnneal approaches structure prediction in the spirit of a needle-in-a-haystack classification problem: a candidate structural ensemble is generated by broadly sampling secondary structures, assembling them into 3D models, selecting representatives, and performing additional conformational sampling with MD simulations (Fig. \ref{fig:schematic}a). If the candidate ensemble contains experimentally resolved conformations (ERCs), then structure prediction amounts to picking them out of the ensemble. To this end, an RNAnneal score is developed based on a physics-inspired generative model, and used to rank candidate structures (Fig. \ref{fig:schematic}b-e). The RNAnneal score is parameterized from the candidate conformations by an ensemble of Thermodynamic Maps, a type of generative model that infers the dependence of the conformational ensemble on environmental variables such as temperature or pressure (Fig. \ref{fig:schematic}b-c). Thermodynamic maps are probabilistic generative models based on the denoising diffusion framework\cite{sohl2015deep}, and have been shown to accurately predict molecular equilibrium distributions from sparse data collected across different thermodynamic conditions. \cite{herron2024inferring,lee2025exponentially,beyerle2025inferring} Consistent with these works, one may tailor the RNAnneal score to a user-specified temperature by annealing the ensemble of score models. 
+
+An essential quality of any RNA structure prediction method is the ability to generalize beyond ERCs, which form the set of known RNA structures. In computational modeling, ERCs are experimentally validated structure models that are serve as ground-truths for computational structure prediction methods. Most approaches are explicitly parameterized, trained, and validated against these experimentally determined structures. However, ERCs capture only a subset of the full conformational ensemble, and assessing model generalization beyond ERCs is critical yet challenging because the true structural ensembles are unknown. Unlike supervised methods that require labeled training data, RNAnneal learns a score function de novo for each sequence, avoiding issues of overfitting to previously observed structures. Within this framework, one may evaluate the score model on ERCs and examine if the model selects for them consistently. If they are well predicted, then the highest-scoring decoy structures may be reconsidered as potential alternative conformations.
+
+We compared conformations sampled by RNAnneal to validated ERCs for 16 riboswitches and found agreement in their interaction compositions, measured by relative fractions of stacking, Watson-Crick and non-Watson-Crick contacts. (Fig. \ref{fig:results}a-b). After simulating the ERCs for 100ns, we found their structures to be dynamic. This informed our decision to use the interaction network fidelity (INF) and root mean squared deviation (RMSD) together as complementary evaluation metrics. RMSD captures global geometric deviation but is sensitive to alignment, while INF captures interaction fidelity independent of alignment (Fig. \ref{fig:results}c-f). In light of the observed flexibility, we evaluated RNAnneal against the simulated ERCs and found that pseudoknot-free (PK-free) near-ERCs were consistently sampled. Following this evaluation, we demonstrate that the unsupervised RNAnneal score prioritizes ERCs over decoys. For each RNA, 20,000 structures (including the ERC) were sampled, and RNAnneal was employed to select ten representative structures for each of the riboswitches. For 11/16 riboswitches, a representative with RMSD $<10\AA$ or INF $>0.75$ from the ERC was selected. Lastly, we introduce the interaction entropy as a per-nucleotide measure of structural heterogeneity within an ensemble (Fig. \ref{fig:ensemble-results}a-b).
+
+\subsection*{Unsupervised sampling and prediction of RNA structures}
+RNAnneal predicts RNA conformations by sequentially sampling and scoring candidate structure models. As such, the first step is to assemble a diverse, physically plausible candidate set of 3D models (Fig. \ref{fig:schematic}a). With only the primary sequence as input, RNAnneal employs physics-based and bioinformatics programs to generate a large number of secondary structures (Eternafold\cite{wayment2022rna}, Linearfold\cite{huang2019linearfold} and LinearAlifold\cite{malik2024linearalifold}; see {\nameref{methods:sec-struct}), which are then assembled into all-atom 3D models using the FARFAR2 algorithm (see \nameref{methods:tertiary-struct}).\cite{huang2019linearfold,wayment2022rna,malik2024linearalifold,watkins2020farfar2} Next, 200 diverse, representative models of the 3D structure are selected by clustering using geometric features and ranking conformations based on their Rosetta scores (see  \nameref{methods:representatives}). To produce a final set of candidate structures, each of the representative conformations is simulated for 100ns via implicit solvent MD (see \nameref{methods:molecular-dynamics}). 
+
+
+Next, we describe the RNAnneal score, which is extracted from an ensemble of generative models trained on energy values (see \nameref{methods:molecular-dynamics}) and latent representations of candidate conformations (Fig. \ref{fig:schematic}b). To arrive at the latent representations, geometric features (see \nameref{methods:rna-features}) are extracted from the candidate conformations and subsequently encoded as latent representations by Principal Component Analysis (PCA) and a State Predictive Information Bottleneck\cite{wang2021state} (see \nameref{methods:spib}) model; the principal components capture the highest-variance geometric features, while the SPIB projections preserve the slowest processes of the MD simulations and learn state boundaries that are metastable over a user-specified timescale.
+
+Then, an ensemble of Thermodynamic Maps\cite{herron2024inferring} (TMs; see \nameref{methods:thermodynamic-map}) is trained to estimate the log-likelihood of the candidate conformations based on their energies and latent representations (Fig. \ref{fig:schematic}c).\cite{herron2024inferring} In this work, we train $28$ TMs on combinations of features (R- and G-vectors) and projections (SPIB and PCA) with 2 to 8 latent dimensions, $d$ (Fig. \ref{fig:schematic}d). It is worth noting that the energy values are consistent across all models, even though the latent representations of a given conformation vary from model to model. Finally, for a given conformation, the TM log-likelihoods are averaged to produce the RNAnneal score (see \nameref{sec:rnanneal}). Our evaluations found that the RNAnneal score can reliably distinguish between ERCs and decoys (Fig. \ref{fig:schematic}e and Fig. \ref{fig:results}c-d).
+
+Since the TM models represent the energy scale of the conformational landscape as a temperature, one may anneal the RNAnneal score by adjusting the temperature of the prior distribution of the TMs during the log-likelihood calculation (see \nameref{sec:rnanneal}). We investigated the classification power of the RNAnneal score as a function of temperature and found that ERCs are most prioritized at low temperatures, which is consistent with ERCs lying low on the free energy landscape (Fig. \ref{fig:model-temp-dependence}).
+
+\begin{figure*}[htbp!]
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./main-results.png}
+    
+    \caption{{\bf RNAnneal evaluated on the riboswitch dataset.} {\bf a.} Comparison between the interaction composition of ERC (red) and RNAnneal conformations (blue). {\bf b.} Distribution of sequence lengths for the riboswitch set. {\bf c.} Maximum RMSD values from MD simulations of the ERC are compared to the minimum RMSD among the RNAnneal conformations. (Median [IQR]; Ref. MD: 6.1{\AA} [$4.2-7.4${\AA}]; RNAnneal: 7.4{\AA} [$6.2-10.7${\AA}]). {\bf d.} Minimum INF values from MD simulations of the ERC are compared to the maximum INF among the RNAnneal conformations (Median [IQR]; Ref. MD: 0.85 [$0.83-0.87$]; RNAnneal: 0.80 [$0.76-0.87$]). {\bf e.} RMSD comparison between simulations of the ERC and conformations predicted by RNAnneal. {\bf f.} INF comparison between simulations of the ERC and conformations predicted by RNAnneal. Conformations with INF$\geq0.85$ (vertical line) are classified as ERCs when evaluating the RNAnneal score (g and h). The superscripts denote the number of PK base pairs in the reference conformations (e and f). {\bf g.} Comparison of AUAC values on the ERC classification task (Median (IQR); Rosetta: 0.59 [$0.45-0.75$]; DES-AMBER: 0.67 [$0.55-0.85$]; RNAnneal: 0.83 [$0.66-0.95$]). {\bf h.} Comparison of BEDROC values for the ERC classification task (Median (IQR); Rosetta: 0.16 [$0.07-0.38$]; DES-AMBER: 0.26 [$0.17-0.48$]. RNAnneal: 0.40 [$0.13-0.73$]).}
+    \label{fig:results}%
+\end{figure*}
+
+\section*{Results}
+
+RNAnneal's structure prediction performance is evaluated on a set of 16 experimentally determined riboswitch structures originally curated in Ref.\cite{townshend2021geometric} (see \nameref{methods:preparation}; Table \ref{tab:riboswitches} and Fig. S\ref{fig:all-representatives}). Riboswitches are typically found in the 5'-untranslated region of bacterial mRNAs and are {\it cis}-acting regulatory elements that control gene expression by up- or down-regulating transcription or translation.\cite{huang2025some} The basis of riboswitch function is conformational: aptamer domains fold into structurally distinct ``bound'' ({\it holo}) and ``free'' ({\it apo}) states in the presence or absence of a cognate ligand, which in turn transmits a signal that alters expression. Riboswitches bind their cognate ligands with high specificity through higher order structural motifs, including multi-helix junctions, loop-loop interactions, and pseudoknots. Such motifs are rich in non-WC interactions and their structures are typically challenging to model prospectively.\cite{das2023assessment,bu2025rna,kretsch2025assessment}
+
+The Root Mean Squared Deviation (see \nameref{methods:rmsd}) and Interaction Network Fidelity (see \nameref{methods:inf}) are employed to measure structural discrepancy between RNAnneal conformations and ERCs. The RMSD measures the average change in atomic positions after optimal alignment of two conformations, while the INF measures the correlation between their nucleobase interaction networks. Both metrics are required because minor differences in the interaction network (e.g., at a helix junction) may result in large coordinate changes and therefore a large RMSD. The INF is more robust to such variations since no alignment is required.
+
+To summarize, we found that RNAnneal consistently samples PK-free near-ERCs, and its score prioritizes them over decoys. Next, we coarse-grained the RNA structures predicted by RNAnneal into states with the goal of predicting weighted ensembles of representative conformations. Then, to assess conformational heterogeneity, we introduced the interaction entropy to quantify the variability of a given nucleotide's interaction patterns within an ensemble. Finally, we show that annealing the RNAnneal score improved ERC classification for most of the riboswitches
+
+% Overall, we found that RNAnneal samples pseudoknot-free ERCs consistently, and that the RNAnneal score prioritizes them over decoy conformations. Then, we predicted weighted conformational ensembles by ranking states predicted by SPIB based on their RNAnneal score and then selecting representative conformers from the highest-ranked states. We found that a 10-member ensemble was sufficient to capture conformations similar to ERCs for 12 of 16 riboswitches. Then, we introduce the interaction entropy as a per-nucleotide measure of conformational heterogeneity  that indicates how variable a given nucleotide's interaction patterns are within an ensemble. Finally, we demonstrate that annealing the RNAnneal score improves the ranking of ERCs.
+
+
+% the procedure for predicting a conformational ensemble consisting of metastable states, and demonstrate that ensembles consisting of 10 representative conformers is sufficient to capture ERC-like conformations for 11 of 16 riboswitches.
+
+% and introduce the interaction entropy as a per-nucleotide measure of conformational heterogeneity within an ensemble. Subsequently, we focused on two cases where the performance of RNAnneal depends strongly on the annealing temperature. Finally, we evaluate RNAnneal predictions against an ensemble of ERCs for the rCbl riboswitch.
+
+\begin{figure*}[htbp!]
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./ensemble-main-fig.png}
+    \caption{{\bf Conformational ensemble prediction with RNAnneal.} {\bf a.} Ten-state conformational ensembles are shown for each riboswitch. The location of the circles conveys the INF and RMSD of the representative conformer for the state, while the size of the circles conveys the state population. Points circled black indicate the representative with the minimum Deviation Index\cite{parisien2009new} (RMSD/INF) from the ERC. {\bf b.} Distribution of interaction entropies for each riboswitch. {\bf c.} Reference ERC for the NAD$^+$ riboswitch colored by the RNAnneal interaction entropy. {\bf d.} State boundaries and representative conformers (stars) projected along the Information Bottleneck (IB). {\bf e.} Five highest-ranked representatives for the NAD$^+$ riboswitch; the INF and RMSD from the ERC and state population are provided for each representative.}
+    \label{fig:ensemble-results}%
+\end{figure*}
+
+\subsection*{RNAnneal samples experimentally resolved conformations of pseudoknot-free riboswitches}
+
+First, we assess if RNAnneal's conformational sampling procedure (Fig. \ref{fig:schematic}a) produces conformations that are similar to ERCs. We compared the interaction composition of conformations sampled by RNAnneal to the reference ERCs and found that 60-80\% of interactions are stacking, 10-30\% are Watson-Crick (WC), and 0-20\% are non-WC for both sets (Fig. \ref{fig:results}a). The interaction composition of the ERCs is consistent, even though their lengths vary from 28 to 149 nucleotides (Fig. \ref{fig:results}b).
+
+Next, the structural similarity of RNAnneal conformations to the ERC was evaluated using RMSD and INF. To assess the stability of the ERCs with respect to thermal fluctuations, we simulated each one for 100ns (see \nameref{methods:molecular-dynamics}) and monitored how the RMSD and INF changed over the course of the simulation (Fig. \ref{fig:results}c-f). We examined the furthest excursion from the reference conformation, as measured by the maximum RMSD (RMSD$_{\mathrm{max}}$) and minimum INF (INF$_{\mathrm{min}}$), and compared to the closest RNAnneal conformation, as measured by RMSD$_{\mathrm{min}}$ and INF$_{\mathrm{max}}$. The median RMSD$_{\mathrm{max}}$ among all reference structures was $6.1${\AA} and the median INF$_{\mathrm{min}}$ was $0.85$; RNAnneal sampled similar conformations, with a median RMSD$_{\mathrm{min}}$ of $7.4${\AA} and a median INF$_{\mathrm{max}}$ of $0.80$ across the set (Fig. \ref{fig:results}c-d).
+
+Ten of the ERCs contain PKs, which are excluded from the secondary structure prediction algorithms we employ. Consequently, the performance of RNAnneal's candidate ensemble degrades as the number of PK base pairs in the ERC increases (superscript in Fig. \ref{fig:results}e-f). Only one PK-containing ERC (6TFF\cite{Huang2020}) was adequately sampled by RNAnneal (RMSD $<5${\AA} and INF $>0.85$) due to conformational sampling provided by FARFAR2 and MD. RNAnneal's sampling was more consistent for the PK-free RNAs, with 5/6 ERCs (2MXS\cite{Schmidtke2015}, 6N2V\cite{Price2018}, 4RUM\cite{Ramesh2014}, 6CB3\cite{Bachas2018}, and 6QN3\cite{Huang2019}) being reproduced. 
+
+A Wilcoxon signed-rank test was employed to evaluate the statistical significance of the difference in means between $\mathrm{RMSD}_\mathrm{max}$ and $\mathrm{RMSD}_\mathrm{min}$ (and $\mathrm{INF}_\mathrm{min}$ and $\mathrm{INF}_\mathrm{max}$), which yielded an ambiguous $p$-value of 0.08 (0.13 for the INFs). A clearer picture arises when comparing the RMSD and INF values separately for the PK-containing and PK-free ERCs. Here, the test yielded a $p$-value of 0.01 for the RMSDs (0.02 for the INFs) among the PK ERCs, and a value of 0.30 (0.63 for the INFs) for the PK-free ones. Based on these results, we concluded that PK-free ERCs were generally modeled well by RNAnneal, while PK-containing ERCs were not, highlighting the ongoing challenges of modeling PKs.
+
+Correlation between INF and RMSD values of RNAnneal conformations, computed separately for each riboswitch, yielded an $r$ of $-0.49\pm0.22$ ($\mu\pm\sigma$) which was indicative of weak correlation (Fig. S\ref{fig:correlation}). This reflects the need for both alignment-based and alignment-free measures of structural fidelity for dynamic molecules such as RNA. Indeed, some ERCs exhibited large changes in RMSD during simulation while still maintaining the interaction network (4RUM\cite{Ramesh2014} and 6VMY) and vice versa (6E1W\cite{Numata2019}). The INF was observed to be more robust to variations in structure caused by thermal fluctuations compared to the RMSD, which is consistent with previous work\cite{parisien2009new}. Notably, the non-WC interaction network was found to be highly dynamic for several of the ERCs (Fig. S\ref{fig:inf-detailed}). 
+
+
+\subsection*{The RNAnneal score is selective for experimentally resolved conformations}
+
+The performance of the RNAnneal score was benchmarked on the task of classifying ERCs and decoy conformations, with comparisons to two other state-of-the-art scores: the Rosetta score and DES-AMBER force field energy (see \nameref{methods:tertiary-struct} and \nameref{methods:molecular-dynamics}). For this evaluation, we create a new set of structures by adding conformations from the reference simulations to the pool of conformations sampled by RNAnneal, and then ordering the set based on their scores (Fig. S\ref{fig:inf_combined}). 
+
+Classification performance was quantified by measuring how well each score prioritized near-ERCs (INF $\geq 0.85$) over decoys (INF $< 0.85$) using two metrics: Area Under the Accumulation Curve (AUAC; see \nameref{methods:auac}) and Boltzmann-Enhanced Discrimination of Receiver Operator Characteristic (BEDROC; see \nameref{methods:bedroc}).\cite{truchon2007evaluating} The AUAC is dominated by contributions from the lowest-ranked models, while BEDROC emphasizes classification accuracy among the highest-ranked structures via a tunable parameter $\alpha$ (equal to 8). Both metrics vary from zero to one, with the latter indicating perfect classification of ERCs over decoys. The RNAnneal score broadly outperformed the Rosetta and DES-AMBER scores on the classification task in both the AUAC and BEDROC metrics (Fig. \ref{fig:results}g-h). RNAnneal had a median AUAC of $0.83$ which was greater than the $0.67$ for DES-AMBER or $0.59$ for Rosetta. Similarly, the median BEDROC for RNAnneal was $0.40$ compared to $0.26$ for DES-AMBER or $0.16$ for Rosetta. Statistical significance was assessed using the Wilcoxon signed-rank test, which yielded $p$-values of $0.02$ (AUAC) and $0.02$ (BEDROC) when comparing the Rosetta score to DES-AMBER, $0.008$ and $0.03$ for RNAnneal and DES-AMBER, and $0.004$ and $0.008$ for RNAnneal and Rosetta. These results provide evidence that the RNAnneal score differs from the Rosetta and DES-AMBER scores at a significance level of $0.05$.
+
+There was little variation in AUAC or BEDROC between different features and projections; instead, most of the variation is due to the latent dimension, $d$ (Fig. S\ref{fig:classification-by-feature}). Similar results were obtained when RMSD $\leq5${\AA} is used as a classification criteria for defining near-ERCs (Fig. S\ref{fig:rmsd-enrichment}). Interestingly, when the TM models performed well on average, we observed an effect where the ensemble-averaged RNAnneal score had superior classification accuracy to the average, and sometimes even the best model (Fig. \ref{fig:results}g-h).
+
+Although PK-containing ERCs were not well-sampled by RNAnneal, the RNAnneal score was able to classify them apart from decoys. The ERCs with the five highest RNAnneal AUAC and BEDROC values (6DLQ\cite{Peselis2018}, 6Q57\cite{Dunstan2018}, 
+6TFF\cite{Huang2020}, 6UBU\cite{Matyjasik2019}, and 6WJR\cite{Wilt2020}) all contained PK base pairs (Fig. \ref{fig:results}g-h). Still, not all PK-containing ERCs were successfully predicted by the RNAnneal score at the temperature used for the main results ($T=1$); some ERCs were better prioritized at lower or higher temperatures (Fig. S\ref{fig:model-temp-dependence}).
+
+\subsection*{Annealing improves classification and ranking of experimentally resolved conformations}
+
+RNAnneal encodes the scale of the energy landscape via a temperature parameter in the TM algorithm (see \nameref{methods:thermodynamic-map}). The structure of the thermodynamic map reflects the following intutition: conformations that are low-lying on the energy landscape are sampled at low temperatures, and therefore ought to be mapped onto a low-variance prior, while those which are high on the energy landscape and sampled at hotter temperatures should be mapped onto a high-variance prior. To prioritize low-energy conformations, one may evaluate the RNAnneal score with a low-variance generative prior (see \nameref{sec:rnanneal}). The main results are presented for $T=1.0$, which corresponds to one standard deviation above the minimum potential energy value. However, there were multiple instances where altering the temperature value improved RNAnneal's performance on the ERC classification task.
+
+The AUAC and BEDROC values improved for 11/16 riboswitches as the temperature was annealed from $T=10$ to $T=1$ (Fig. S\ref{fig:model-temp-dependence}). The AUAC and BEDROC plateau as the inference temperature was decreased further for eight riboswitches (2MXS\cite{Schmidtke2015}, 6C27\cite{Grigg2018}, 6DLQ\cite{Peselis2018}, 6N2V\cite{Price2018}, 6Q57\cite{Dunstan2018}, 6TFF\cite{Huang2020}, 6UBU\cite{Matyjasik2019}, and 6WJR\cite{Wilt2020}), while classification performance continued to improve down to $T=0.1$ for three (6E1W\cite{Numata2019}, 6QN3\cite{Huang2019}, and 6VMY\cite{Chan2020}). The AUAC and BEDROC values showed little response to annealing for two riboswitches (4NYA\cite{Warner2014} and 4YAZ\cite{ren2015structural}), and while performance degraded slightly for three others (6CB3\cite{Bachas2018}, 4RUM\cite{Ramesh2014}, and 3Q3Z\cite{Smith2010}), the overall change in classification performance was relatively small.
+
+\subsection*{State-informed prediction of conformational ensembles}
+
+As stated previously, RNA structure is best understood in terms of conformational ensembles consisting of weighted states and representative conformations. ERCs provide critical and informative snapshots but do not elucidate the full ensemble. In addition to sampling 3D structures, ensemble prediction requires state assignments and the selection of representatives--a process that often relies on intimate knowledge of the system in question and human intuition. RNAnneal automates the process of generating a conformational ensemble by ranking states predicted by SPIB based on their average RNAnneal score, and then selecting the highest-scoring conformation from within each state as a representative structure (see \nameref{methods:state-ranking}).
+
+We predict ten-state ensembles for each of the 16 riboswitches and measure the state population and deviation from the ERC (RMSD and INF) for each representative. Note that the combined decoy and ERC dataset from the AUAC and BEDROC evaluation is employed here so that the model has an opportunity to predict ERCs in the ensemble, even if they were not sampled by RNAnneal. Ultimately, we found that RNAnneal predicted near-ERC structures ($\mathrm{RMSD}<5${\AA} and $\mathrm{INF}>0.85$) as representatives for 5/16 riboswitches, and 11/16 had representatives that satisfy a more relaxed similarity criteria ($\mathrm{RMSD}<10${\AA} or $\mathrm{INF}>0.80$) to the ERC (Fig. \ref{fig:ensemble-results}a). The top five representative conformers for each riboswitch are reported in Fig. S\ref{fig:rep-ensemble-1}-\ref{fig:rep-ensemble-4}.
+
+\subsection*{Quantification of ensemble heterogeneity via
+per-nucleotide interaction entropy}
+
+The simulations of the riboswitch ERCs revealed their interaction networks to be dynamic, especially in terms of non-WC interaction patterns (Fig. S\ref{fig:inf-detailed}). Consistent with this observation, the riboswitch ensembles predicted by RNAnneal contained heterogeneous structures spanning wide ranges of RMSD and INF values (Fig. \ref{fig:ensemble-results}a). To assess heterogeneity in nucleobase interaction patterns across an ensemble, we develop the per-nucleotide interaction entropy.
+
+The interaction entropy for a given nucleotide in a structural ensemble is the Shannon entropy of its Leontis-Westhof base-base contact classifications (see \nameref{methods:interaction-entropy}). When the interaction entropy is zero, the corresponding nucleotide is found in the same base-base interaction  across all conformations in the ensemble, and as the interaction entropy increases, the nucleobase participates in more varied interactions. When measured in bits, an interaction entropy equal to $H$ for nucleotide $i$ implies that $i$ participates in $2^H$ interactions across the ensemble; based on this, we bin the interaction entropy around integer values (colors in Fig. \ref{fig:ensemble-results}b).
+
+The distribution of interaction entropies for the riboswitch ensembles predicted by RNAnneal indicate that a few of the riboswitches have mostly well-determined interaction patterns (light and dark blue in Fig. \ref{fig:ensemble-results}b), but most were predicted to have many nucleotides with variable interaction patterns (yellow and red in Fig. \ref{fig:ensemble-results}b). To aid in visualization of heterogeneity, the interaction entropy may also be used to color each nucleotide using the ranges indicated in Fig. \ref{fig:ensemble-results}b, as is done in Fig. S\ref{fig:rep-ensemble-1}-\ref{fig:rep-ensemble-4}.
+
+\subsection*{Evaluation of RNAnneal on experimentally resolved \textrm{\textbf{\textit{holo}}}  riboswitch conformations}
+
+RNAnneal was evaluated on fourteen {\it holo} riboswitches representing ligand-bound states that span transition-metal and natural-ligand complexes. Across this diverse set, RNAnneal frequently recovered conformations resembling experimentally resolved structures.
+
+RNAnneal successfully predicted near-ERC representative structures for the transition-metal riboswitches (4RUM\cite{Ramesh2014}, 6CB3\cite{Bachas2018}, and 6N2V\cite{Price2018}). The interaction network of the ERC for the cobalt-binding riboswitch (4RUM\cite{Ramesh2014}) was reproduced in representative conformations predicted by RNAnneal (INF of $0.82$ and RMSD of $8.1${\AA} in Fig. \ref{fig:ensemble-results}a). Predicted structures for the cadmium- and manganese-binding riboswitches (6CB3\cite{Bachas2018} and 6N2V\cite{Price2018}, respectively) were slightly less accurate in terms of INF ($0.80$ for 6CB3\cite{Bachas2018} and $0.78$ for 6N2V\cite{Price2018}) and RMSD ($10.6${\AA} for 6CB3\cite{Bachas2018} and $8.5${\AA} for 6N2V\cite{Price2018}). All three riboswitches had regions were the interaction entropy was low, indicating consistent structure across the ensemble (Fig. \ref{fig:ensemble-results}b). Visual inspection of the ERCs colored by the RNAnneal interaction entropy reveals that nucleobases with variable interaction patterns are in close proximity to bound transition metals in the {\it holo} structure (Fig. S\ref{fig:rep-ensemble-1}-\ref{fig:rep-ensemble-4}).
+
+The rest of the {\it holo} ERCs bind natural ligands, which present a greater variety of interaction modes due to their diverse chemistry and spatially extended nature. RNAnneal recovered near-ERCs as representatives for four of the riboswitches, as quantified by an INF value greater than $0.85$ and RMSD less than $5${\AA} (3Q3Z\cite{Smith2010}, 6TFF\cite{Huang2020}, 6UBU\cite{Matyjasik2019}, and 6DLQ\cite{Peselis2018}). Superimposing the RNAnneal interaction entropy on each of the ERCs reveals variable interaction patterns for nucleobases close to the binding site(s) (Fig. \ref{fig:ensemble-results}c and S\ref{fig:rep-ensemble-1}-\ref{fig:rep-ensemble-4}). The next grouping includes two riboswitches (2MXS\cite{Schmidtke2015} and 6QN3\cite{Huang2019}) for which the RNAnneal representatives had moderate accuracy with respect to the ERC ($0.7<\mathrm{INF}<0.85$ and $5\mathrm{{\AA}}<\mathrm{RMSD}<10${\AA}). The INF for the neomycin sensing riboswitch (2MXS\cite{Schmidtke2015}) is low due to the relatively small number of interactions present; RNAnneal predicted multiple conformations with RMSDs between 5 and 10{\AA}, indicating good prediction accuracy. The glutamine II riboswitch (6QN3\cite{Huang2019}) was solved via X-ray crystallography as a dimer, but was predicted as a monomer by RNAnneal. As a result, a large fraction of the bases in the ERC appear to be unpaired but actually form inter-chain interactions. Nonetheless, RNAnneal predicts a representative conformation less than $10${\AA} in RMSD from the ERC. Remarkably few nucleobases had a consistent interaction pattern, indicating that the monomer may not have a dominant stable fold (Fig. \ref{fig:ensemble-results}b and S\ref{fig:rep-ensemble-1}-\ref{fig:rep-ensemble-4}). 
+
+
+RNAnneal successfully recovered near-ERC representatives for 9/14 holo riboswitches. The remaining 5 systems (4NYA\cite{Warner2014}, 4YAZ\cite{ren2015structural}, 6E1W\cite{Numata2019}, 6Q57\cite{Dunstan2018}, 6VMY\cite{Chan2020}) showed lower agreement with the ERCs, as quantified by an INF value less than $0.7$ and a RMSD greater than 10{\AA} (Fig. \ref{fig:ensemble-results}a). Compared to the previous groupings, these riboswitches were predicted to have many nucleotides with high interaction entropy, consistent with a more flexible or dynamic structural ensemble (Fig. \ref{fig:ensemble-results}b). In general, nucleobases in close proximity to ligand binding sites have higher interaction entropies (Fig. S\ref{fig:rep-ensemble-1}-\ref{fig:rep-ensemble-4}).
+
+% \lh{note structures where cobalt hexammine was added}
+
+\subsection*{Evaluation of RNAnneal on experimentally resolved \textrm{\textbf{\textit{apo}}}  riboswitch conformations}
+
+Riboswitch ERCs are typically representative of the {\it holo} state due to increased conformational flexibility (i.e., heterogeneity) in the absence of a ligand. Consequently, the {\it apo} conformations of riboswitches are generally poorly characterized. Fortunately, two riboswitch ERCs have been solved in the {\it apo} state (6C27\cite{Grigg2018} and 6WJR\cite{Wilt2020}). For the S-adenosyl methionine (SAM) III riboswitch (6C27\cite{Grigg2018}), multiple representative conformers with INF greater than 0.8 and RMSD between  10 and 15{\AA} were predicted by RNAnneal (Fig. \ref{fig:ensemble-results}a). Similarly, RNAnneal predicted a representative conformation less than 5{\AA} in RMSD from the ERC for the flavin mononucleotide (FMN) riboswitch in the apo state (6WJR\cite{Wilt2020}). The RNAnneal ensemble for SAM III riboswitch is somewhat homogenous as indicated by lower interaction entropies; the FMN riboswitch however, is more heterogeneous, likely due to PK base pairs present in the ERC which were poorly modeled during the structure sampling step (Fig. \ref{fig:ensemble-results}b)
+
+\subsection*{\textrm{\textbf{\textit{De novo}}} prediction of \textrm{\textbf{\textit{apo}}} riboswitch conformations}
+
+
+While experimentally resolved {\it apo} riboswitch structures are valuable benchmarks, most systems lack such reference structures, necessitating a {\it de novo} approach to characterize their conformational landscapes. RNAnneal is uniquely suited for this task since it is an unsupervised model.
+
+We focus on the NAD$^{+}$ riboswitch as a representative example and note that similar reasoning may be applied to other RNAs. This choice is motivated by three factors: the {\it holo} ERC (6TFF\cite{Huang2020}; Fig. \ref{fig:ensemble-results}c) was predicted {\it de novo} by RNAnneal (Fig. \ref{fig:results}e–f), found to have a fragile interaction network (Fig. S\ref{fig:inf-detailed}), and was prioritized by the RNAnneal score (Fig. \ref{fig:results}g–h).
+
+Inspection of the location of the ten representative conformations in the SPIB latent space associated with the NAD$^{+}$ riboswitch generated using RNAanneal reveals only five distinct clusters. The clusters are represented among the top five (of ten total) representative conformations (Fig. \ref{fig:ensemble-results}d). The first- and second-ranked states span the first information bottleneck (IB) component, suggesting that they are endpoints of the slowest structural transition. The representative conformation for the top-ranked state forms a single continuous helix with a six nucleotide overhang, while the second-ranked state forms a cloverleaf structure (Fig. \ref{fig:ensemble-results}d). The third-, fourth-, and tenth-ranked states cluster together and exhibit an internal loop that propagates up the 5' side of the helix as the 5' and 3' ends pair together. The internal loop moves further up the helix in the fifth- through ninth-ranked states, where the representatives closely model the holo ERCs (both with and without the PK contacts). The transition from the {\it holo} ERC to the second-ranked state is unclear, but one may reasonably infer that the transition involves the loop propagating further up the helix. 
+
+% \subsection*{Interaction entropy and the crystallization environment}
+
+% \lh{make this more brief and add to conclusion}
+
+% X-ray crystal structur/es of ERCs frequently include auxiliary co-factors introduced to facilitate crystallization. Common co-factors include naturally appearing divalent cations like Mg$^{2+}$ (or less commonly Ca$^{2+}$, Ba$^{2+}$, or Sr$^{2+}$) which are essential to neutralize the negative charges of the phosphate backbone. Other co-factors, like cobalt hexammine coordination complexes, screen backbone charges and stabilize tertiary structure but would have no direct counterpart which would stabilize the structure {\it in vivo} (see 6C27, 6UBU, and 6VMY in Fig. S\ref{fig:rep-ensemble-1}-S\ref{fig:rep-ensemble-4}).
+
+% The AUAC and BEDROC results indicate that RNAnneal prioritizes experimentally-resolved riboswitch structures over decoys. However, all but one of the reference ERCs are representative of the {\it holo} state. It is oftentimes infeasible to probe {\it apo} conformations with current high-resolution techniques due to increased conformational flexibility (i.e., heterogeneity) in the absence of a ligand. We make predictions of {\it apo} conformations for each riboswitch by ranking states predicted by SPIB based on their average RNAnneal score (see \nameref{methods:state-ranking}). 
+
+% We present an example prediction for the NAD$^{+}$ riboswitch: the {\it holo} ERC (6TFF) contains two pseudoknotted base-pairs that form a bulge-loop interaction, which stabilizes the otherwise disordered loop to accommodate a ligand (Fig. \ref{fig:results}i; ligand not pictured). We report an ensemble containing the top-five ranked states (Fig. \ref{fig:results}j-k). The bulge nucleotides are sequestered by base pairing in the representative conformation for the top-ranked state; the second-, third-, and fourth-ranked state representatives reflect conformational flexibility in the absence of the loop-bulge interaction; and the representative conformation for the fifth-ranked state presents an altogether different cloverleaf structure (Fig. \ref{fig:results}k). 
+
+% The ERC for FMN riboswitch (6WJR) is the only {\it apo} representative in the set. Although RNAnneal failed to sample the ERC due to pseudoknotted base pairs, it was unambiguously selected for when evaluating the RNAnneal score (Fig. \ref{fig:results}e-h). Five-state predictions are provided in Fig. S\ref{fig:rep-ensemble-1}-S\ref{fig:rep-ensemble-4} for all 15 riboswitches. 
+
+
+
+
+
+% \lh{6QN3 (solved as a dimer--ranked highly at low temperatures)}
+
+% \subsection*{RNAnneal predicts experimentally resolved conformations for the heterogeneous Colabamin riboswitch}
+
+
+% \lh{Write paragraph analyzing the three worst-performing cases. 6VMY (highly heterogeneous)}
+
+
+
+
+\section*{Discussion}
+
+RNAnneal introduces an unsupervised, {\it ab initio} framework for predicting three-dimensional structural ensembles of RNA. The strong performance of RNAnneal on RNA structure prediction tasks may be attributed to multiple factors, including a hierarchical approach to sampling the structural ensemble, geometric and dynamics-based structure featurization, and deep learning models that incorporate physics-inspired inductive biases. The high performance of RNAanneal on structurally challenging systems indicates that that RNAnneal will be an essential tool for rapidly predicting three-dimensional conformations of RNA molecules. 
+
+Determining how to venture beyond experimental structures of both RNAs and proteins is critical in the post-AlphaFold2 world. RNAnneal generalizes beyond known ERCs by employing {\it ab initio} sampling to generate training data, and unsupervised deep learning to distinguish between experimentally resolved and decoy structures. Although in this manuscript RNAnneal has been benchmarked exclusively on the challenging case of riboswitches, the method is expected to generalize well since the structure generation pipeline relies exclusively on minimally parameterized physical models which have been previously evaluated on a variety of systems.\cite{watkins2020farfar2,tan2018rna} 
+
+RNAs are dynamic, flexible entities containing both persistently structured elements such as helices and dynamic elements such as internal loops. Variability of these structures is captured by RNAnneal's ensemble output, and flexibility hotspots are conveyed by the interaction entropy. One may examine the riboswitch ERCs colored by their predicted interaction entropies in Fig. S\ref{fig:rep-ensemble-1}–\ref{fig:rep-ensemble-4}. Visual inspection of the structure datasets reveals that regions of moderate-to-high interaction entropy (yellow and red nucleotides) frequently coincide with the presence of stabilizing molecules such as metabolite ligands (e.g., Neomycin in 2MXS\cite{Schmidtke2015} or PreQ1 in 6E1W\cite{Numata2019}), metal ions (e.g., Mn$^{2+}$ in 6N2V\cite{Price2018} or Cd$^{2+}$ in 6CB3\cite{Bachas2018}), or crystallization additives such as cobalt hexammine (e.g., in 6C27\cite{Grigg2018} or 6UBU\cite{Matyjasik2019}). Regions with high interaction entropy may be important for ligand binding, allosteric regulation, or functional switching. 
+
+% For example, the steps taken to sample the candidate ensemble are not meant to be prescriptive. Additional secondary structures, such as those predicted by methods that use PK heuristics, would expand the conformational space sampled by RNAnneal, especially if combined with experimental data such as chemical probing or NMR.\cite{sato2011ipknot,zhang2019threshknot,hajdin2013accurate,gong2024accurate} Additional 3D structures sampled by methods other than FARFAR2 may also be added to the candidate ensemble. One could, for instance, use the RNAnneal score to compare 3D structure predictions from popular deep learning methods like Boltz-1\cite{wohlwend2025boltz}, AlphaFold3\cite{abramson2024accurate}, or RoseTTAFold2NA\cite{baek2024accurate} or use RNAnneal to decide between models generated by different physics- and informatics-based sampling methods.\cite{xu2014vfold,xu2015physics,kim2015computational,xiong2021pairing,li2023rnajp}
+While RNAnneal is already demonstrated to be capable of tertiary structure ensemble prediction for different problems, it is a general and highly modular framework with many further directions for improvement. First, magnesium ions that facilitate folding by both neutralizing the phosphodiester backbone and binding to specific sites in folded RNA\cite{brion1997hierarchy}, are not explicitly treated by RNAnneal. Future work should focus on both more appropriately modeling Mg$^\mathrm{2+}$ implicitly and predicting the location of explicit, bound Mg$^\mathrm{2+}$.\cite{yamagami2021functional}Second, employing templates for hard-to-sample motifs such as kink turns and multi-helix junctions\cite{sarver2008fr3d,laing2009analysis,roll2016jar3d} may improve the quality of the sampled 3D structures, and would not bias the RNAnneal score since it is both unsupervised and parameterized {\it ab initio}. Third, the RNAnneal score may be extended to environmental variables like pressure and chemical potential, which have already been incorporated into the Thermodynamic Maps framework.\cite{lee2025exponentially} Finally, the coverage of the candidate structure pool could be improved by including outputs from PK-aware secondary structure prediction algorithms\cite{xu2014vfold,xu2015physics,kim2015computational,xiong2021pairing,li2023rnajp} and candidates models from physics-based\cite{xiong2021pairing,li2022vfold,li2023rnajp,watkins2018blind} and deep-learning \cite{abramson2024accurate,chai2024chai,wohlwend2025boltz, baek2024accurate} tertiary structure prediction methods.
+
+Overall, RNAnneal provides a target-specific method to generate and score 3D RNA structure ensembles from sequence alone that makes ensemble-level RNA structure prediction tractable and interpretable, and will help shine light on the sequence-structural ensemble relationships that underlie RNA diversity and function.
+
+
+\section*{Acknowledgments}
+This research was supported by the Intramural Research Programs of the National Institutes of Health, National Cancer Institute (NCI), Center for Cancer Research, Project BC011585 (to J.S.S.), by the National Institute of General Medical Sciences of the National Institutes of Health under Award Number R35GM142719, the National Science Foundation under Grant No. CHE-2044165 and the Maryland Technology Development Corporation (TEDCO) through the Maryland Innovation Initiative (MII) program under Grant No. 0725-0192. The authors thank UMD HPC's Zaratan and NSF ACCESS (project CHE180027P) for computational resources. P.T. is an investigator at the University of Maryland-Institute for Health Computing, which is supported by funding from Montgomery County, Maryland and The University of Maryland Strategic Partnership: MPowering the State, a formal collaboration between the University of Maryland, College Park, and the University of Maryland, Baltimore. The content is solely the responsibility of the authors and does not represent the official views of the National Institutes of Health.  
+
+\section*{Competing Interests}
+The authors declare the following competing financial interest(s): P.T. is a consultant to Schrodinger, Inc. and is on their Scientific Advisory Board.
+P.T. and L.H. are co-founders of and hold equity in Emergente, Inc. P.T and L.H are named inventors on a pending patent application for RNAnneal filed by the University of Maryland (U.S. application no. 19/278,449).
+
+\section*{Code Availability}
+An academic web server implementing RNAnneal is available for non-commercial academic use; access can be requested via \url{https://go.umd.edu/rnanneal}.
+
+\section*{Methods}
+
+\subsection*{Secondary Structure Prediction}
+\phantomsection
+\setcurrentname{Secondary Structure Prediction}
+\label{methods:sec-struct}
+The secondary structure of an RNA is a simplified representation that specifies Watson-Crick base pairing. There are numerous, long-standing approaches available to predict secondary structures from the primary sequence.\cite{sato2023recent} RNAnneal relies on three programs to predict RNA secondary structures: EternaFold\cite{wayment2022rna}, LinearFold\cite{huang2019linearfold}, and LinearAliFold\cite{huang2019linearfold}. EternaFold is a probabilistic method for secondary structure prediction that
+has been benchmarked against several widely used secondary structure prediction algorithms (Algorithm \ref{alg:eternafold-sampling}). LinearFold is an algorithm for predicting secondary structures that has linear runtime with sequence length (Algorithm \ref{alg:linearfold-sampling}). LinearAliFold extends the functionality of LinearFold by implementing stochastic sampling (Algorithm \ref{alg:linearalifold-sampling}). After a large number of secondary structures have been predicted by the above methods, the structures are aggregated and redundant ones are filtered out.  Fig. S\ref{fig:sec-struct-eval} measures the fraction of correctly predicted bases for the predicted distributions of secondary structures for each riboswitch. 
+
+\subsection*{FARFAR2}
+\phantomsection
+\setcurrentname{FARFAR2}
+\label{methods:tertiary-struct}
+
+Rosetta's Fragment Assembly of RNA with Full-Atom Refinement (FARFAR) is a hybrid knowledge- and physics-based approach to sampling models of 3D RNA structure.\cite{das2010atomic} FARFAR samples 3D models by performing Monte Carlo sampling on a low-resolution potential using a library of experimentally validated structure fragments, and then relaxes the structure in a higher-resolution all-atom potential. The quality of the conformations is evaluated by the Rosetta score. FARFAR2 further improves the performance of FARFAR with updates to the sampling algorithms, scoring weights, and fragment libraries.\cite{watkins2020farfar2} The Rosetta score referred to in the main text and Fig. \ref{fig:results}g-h corresponds to the \texttt{rna\_hires.wts} file in Rosetta v2021.16.61629. Algorithm \ref{alg:rna_denovo} describes how RNAnneal uses FARFAR2 to sample a candidate model of the 3D structure with the primary sequence and a secondary structure as input.
+
+\subsection*{Clustering}
+\phantomsection
+\setcurrentname{Clustering}
+\label{methods:representatives}
+
+A crucial step in RNAnneal is selecting representative conformations to simulate (see \nameref{methods:molecular-dynamics}) from the set of structures predicted by \nameref{methods:tertiary-struct}. To sample diverse conformations, we first compute G-vectors for the FARFAR2 conformations (see \nameref{methods:rna-features}), and then project the G-vectors onto $d=2,3,\ldots,26$ principal components. For each $d$ value, the data is clustered using the advanced density peaks algorithm\cite{d2021automatic} implemented in \texttt{dadapy}\cite{glielmo2022dadapy} with $Z=3$. Representatives are selected based on the the $d$ value that yields the maximum number of clusters (Fig. S\ref{fig:clusters_vs_d}). To select, e.g., 200 candidate structures, we first sort the conformations within each cluster based on their Rosetta score and then sort the clusters based on the top-scoring conformation in each cluster. The clusters are then traversed in order, and the top-scoring conformation is selected as a representative and subsequently removed from the cluster. If there are fewer than 200 candidate structures after all clusters have been traversed, then they are reordered based on the new top-scoring conformation and the selection procedure is repeated until 200 conformations are obtained. The entire procedure is detailed in Algorithm \ref{alg:candidate-selection}.
+
+\subsection*{Molecular Dynamics}
+\phantomsection
+\setcurrentname{Molecular Dynamics}
+\label{methods:molecular-dynamics}
+
+RNAnneal simulates models of 3D RNA structure with implicit solvent MD in order to introduce variations in structure caused by the thermal environment. The simulations are conducted under the NVT ensemble using the OpenMM simulation engine and the DES-AMBER RNA force field.\cite{eastman2023openmm,tan2018rna} The conformations are equilibrated by gradually increasing the temperature from $1$K to $300$K and then increasing the integration timestep from $1$fs to the production integration timestep of $5$fs (Table \ref{tab:schedule}). The production simulation is 100ns and frames are saved at 1ns intervals; additional simulation parameters like ion concentration and solvent model are provided in Table \ref{tab:parameters}. The DES-AMBER score is the potential energy of the MD simulations (i.e., the energy values of the force field and solvent model) standardized by first aggregating the energy across all simulations (for a given RNA) and then subtracting the minimum value and dividing the standard deviation.
+
+\subsection*{R- and G-vectors}
+\phantomsection
+\setcurrentname{R- and G-vectors}
+\label{methods:rna-features}
+RNAnneal featurizes conformations with two nucleobase-centric representations constructed from R- and G-vectors.\cite{bottaro2014role} An R-vector is a displacement vector $\mathbf{r}_{ij}$ directed between the six-membered aromatic ring of nucleobases $i$ and $j$. The R-representation of a conformation with $N$ nucleobases is thus a tensor of shape $N \times N \times 3$. Similarly, the G-representation is a $N \times N \times 4$
+tensor consisting of G-vectors that capture the geometry of localized base-pairing and stacking interactions. The G-vector, $\mathbf{G}_{ij}$, is computed as
+\begin{gather}
+    \mathbf{G}_{ij}(\mathbf{r}_{ij}) = 
+    \begin{pmatrix}
+    \sin (\gamma \lvert \mathbf{r}_{ij}\rvert)\frac{r_{ij,x}}{\lvert \mathbf{r}_{ij}\rvert} & \\
+    \sin (\gamma \lvert \mathbf{r}_{ij}\rvert)\frac{r_{ij,y}}{\lvert \mathbf{r}_{ij}\rvert} & \\
+    \sin (\gamma \lvert \mathbf{r}_{ij}\rvert)\frac{r_{ij,z}}{\lvert \mathbf{r}_{ij}\rvert} &  \\
+    1 + \cos (\gamma \lvert \mathbf{r}_{ij}\rvert)
+    \end{pmatrix}
+    \times \frac{\Theta (\lvert \mathbf{r}_{ij}\rvert - r_c)}{\gamma}
+\end{gather}
+where $\Theta$ is a step function, $r_c$ is a cutoff of $2.4${\AA}, and $\gamma=\pi/r_c$.
+
+\subsection*{SPIB}
+\phantomsection
+\setcurrentname{SPIB}
+\label{methods:spib}
+
+The State Predictive Information Bottleneck (SPIB) framework allows one to embed a high-dimensional dynamical system into a lower-dimensional latent space while preserving the slowest degrees of freedom of the system.\cite{wang2021state} SPIB takes the form of a time-lagged autoencoder, where high dimensional coordinates at time $t$ are passed to the encoder and embedded in a latent space; the decoder must then predict the state label at time $t+\Delta t$ solely from the latent embedding. SPIB has two main hyperparameters: the time lag, $\Delta t$ and a regularizer, $\beta$. The time lag corresponds to the lifetime of the predicted states, while $\beta$ regularizes the latent space to follow a mixture of Gaussians prior. We train two sets of SPIB models on the first 8 principal components of the \nameref{methods:rna-features}. For each feature type, we train seven models with the number of IB components, $d$, ranging from 2 to 8. For all models, we use a linear encoder, non-linear decoder, a $2$ns lag time, and set $\beta=0.05$. The SPIB implementation is provided by the \texttt{af2rave} python package.\cite{teng2025alphafold2} 
+
+% \lipsum[8]
+
+\subsection*{Thermodynamic Maps}
+\phantomsection
+\setcurrentname{Thermodynamic Maps}
+\label{methods:thermodynamic-map}
+
+A thermodynamic map (TM) is a diffusion model variant that models the dependence of a structural ensemble on physical parameters like temperature, pressure, or chemical potential by representing their statistical effect on the prior distribution.\cite{herron2024inferring,lee2025exponentially,beyerle2025inferring} Temperature, for example, is represented by tempering the prior (i.e., adjusting the variance) on a per-sample basis, while pressure and chemical potential correspond to exponential tilting operations that shift the mean of the prior.\cite{herron2024inferring,lee2025exponentially} Once trained, the TM model can then be used to generate new samples or evaluate the likelihood of existing samples at a given set of thermodynamic conditions. In this work we modify the construction so that the prior is tempered based on the energy of the conformations. Concretely, for a given representation $\mathbf{x}_0$, we set the variance of the prior equal to the DES-AMBER score, $U_0$, of the conformation corresponding to $\mathbf{x}_0$ (see \nameref{methods:molecular-dynamics}; Fig. \ref{fig:schematic}c). The \nameref{sec:rnanneal} for a given conformation is computed from the log-likelihoods of the latent representations under the trained models. The log-likelihood calculation is summarized in Algorithm \ref{alg:diffusion-likelihood} and described in detail in Ref.\cite{john2025comparison} Our TM implementation infers the energy-dependence of the conformational ensemble, and as a result one must choose a variance (i.e., a temperature) for the prior when computing the score. All the results in the main text employ a unit variance prior, but other values sometimes lead to better performance (Fig. S\ref{fig:model-temp-dependence}-S\ref{fig:acc-curve-summary}).
+
+% A thermodynamic map (TM) is a diffusion model variant that models the dependence of a structural ensemble on physical parameters like temperature, pressure, or chemical potential by representing these parameters in the prior distribution.\cite{herron2024inferring,lee2025exponentially,beyerle2025inferring} The TM model can then be used to generate new samples or evaluate the likelihood of existing samples at a given temperature. In Ref. \cite{herron2024inferring}, for example, structures observed at a low temperature are mapped onto a prior with a small variance (i.e., a low temperature) while high-temperature samples are mapped onto a prior with large variance. In this work we modify the construction so that the TM encodes both the free- and potential-energy landscape of an RNA molecule: conformations that are low-lying on the energy landscape are mapped onto a low-variance prior, while those high on the energy landscape are mapped onto a high-variance prior. More concretely, for a given representation $\mathbf{x}_0$, we set the variance of the prior equal to the DES-AMBER score, $U_0$, of the conformation corresponding to $\mathbf{x}_0$ (see \nameref{methods:molecular-dynamics}; Fig. \ref{fig:schematic}c). The \nameref{sec:rnanneal} for a given conformation is computed from the log-likelihoods of the latent representations under the trained models. The log-likelihood calculation is summarized in Algorithm \ref{alg:diffusion-likelihood} and described in detail in Ref.\cite{john2025comparison} Evaluating the log-likelihood requires choosing a variance for the prior; all of the results reported in the main text are generated at $T=1$, but we found the RNAnneal score to be robust with respect to choice of $T$ (Fig. S\ref{fig:model-temp-dependence}-S\ref{fig:acc-curve-summary}).
+
+
+\subsection*{RNAnneal Score}
+\phantomsection       
+\setcurrentname{RNAnneal Score} 
+\label{sec:rnanneal}            
+
+RNAnneal scores conformations using an ensemble of \nameref{methods:thermodynamic-map} trained on geometric and energetic features extracted from a set of 3D conformations (Fig. \ref{fig:schematic}b-d). A total of 28 TMs are trained for each RNA, covering all four combinations of representations (\nameref{methods:rna-features}) and projections (PCA and \nameref{methods:spib}). For each feature-projection combination, the number of projection components $d$ varies from 2 to 8 inclusive. After training, the RNAnneal score is computed from the log-likelihoods of the training data under the TM ensemble (Algorithm \ref{alg:diffusion-likelihood} and \ref{alg:rnanneal-score}).
+
+\subsection*{Reference Structures}
+\phantomsection       
+\setcurrentname{Reference Structures}
+\label{methods:preparation}
+
+RNAnneal's structure prediction performance was evaluated on a set of riboswitch sequences with structures that have been solved by high-resolution experimental methods (Table \ref{tab:riboswitches} and Fig. S\ref{fig:all-representatives}). The reference ERCs were prepared by downloading the associated Protein Data Bank (PDB) entry, removing any non-nucleic residues, filling in missing nucleobases using \nameref{methods:tertiary-struct}, and subsequently minimizing the conformation with the Rosetta energy function (see Algorithm \ref{alg:farfar-minimise}).
+
+\subsection*{RMSD}
+\phantomsection       
+\setcurrentname{RMSD}
+\label{methods:rmsd}
+
+Root Mean Squared Deviation (RMSD) is a metric commonly used to evaluate discrepancies between structure models. We evaluate the heavy-atom RMSD of each model after alignment to the native structure. The RMSD between a model $\mathbf{x}$ and reference $\mathbf{y}$ conformation containing $N$ heavy atoms is defined as
+\begin{equation}
+    \mathrm{RMSD}(\mathbf{x}, \mathbf{y}) = \sqrt{\frac{1}{N}\sum_{i=1}^N d(\mathbf{x}_i, \mathbf{y}_i)^2},
+\end{equation}
+where $d(\mathbf{x}_i, \mathbf{y}_i)$ measures the distance between the $i$-th atom in both models. The RMSD values for RNAnneal conformations and molecular dynamics simulations of the reference structure are reported in Fig. S\ref{fig:rmsd_decoys} and Fig. S\ref{fig:rmsd_reference}. 
+
+\subsection*{INF}
+\phantomsection       \setcurrentname{INF}
+\label{methods:inf}
+
+Interaction Network Fidelity (INF) quantifies the similarity between two conformations based on their Leontis-Westhof base pairing and stacking classifications.\cite{parisien2009new,leontis2001geometric} Let $S_m$ and $S_r$ denote the sets of nucleobase interactions (base pairs and base stacks) in the model and reference conformations, respectively. The INF is defined as the Fowlkes-Mallows Index between these interaction sets:
+\begin{equation}
+\mathrm{INF} = \sqrt{\frac{|\mathrm{TP}|}{|\mathrm{TP}|+|\mathrm{FP}|}\times \frac{|\mathrm{TP}|}{|\mathrm{TP}|+|\mathrm{FN}|}}
+\end{equation}
+where $\mathrm{TP} = S_m \cap S_r$ are interactions present in both structures, $\mathrm{FP} = S_m \ S_r$ are interactions present only in the model, and $\mathrm{FN} = S_r \ S_m$ are interactions present only in the reference. Minor, localized structural differences (e.g., at a helix junction) may yield large RMSD values due to poor global alignment. Because the INF compares interaction networks directly without requiring alignment, it is more robust to such variations and to thermal fluctuations. We compute the INF using the ClaRNA\cite{walen2014clarna} implementation in \texttt{rna-tools}\cite{magnus2020rna}. INF values are reported in Fig. S\ref{fig:inf-detailed} and S\ref{fig:inf_reference}-\ref{fig:inf_decoys}.
+
+\subsection*{AUAC}
+\phantomsection       \setcurrentname{AUAC}
+\label{methods:auac}
+The Area Under the Accumulation Curve (AUAC) is a metric suited for evaluating classification task performance (Fig. \ref{fig:schematic}e and \ref{fig:results}g).\cite{truchon2007evaluating} Let $x\in [0,1]$ be the normalized rank and $f:r \rightarrow \{0,1\}$ be an associated set of labels, with $1$ indicating the positive (near-ERC) class and $0$ indicating the decoy class. The empirical CDF is then
+\begin{equation}
+    A(r) = \int_0^r f(s)ds
+\end{equation}
+and the area under the accumulation curve is 
+\begin{equation}
+    \label{eq:auac}
+    \mathrm{AUAC} = \int_0^1 A(r)dr.
+\end{equation}
+When the $\mathrm{AUAC}$ is $1$, the classification is perfect, i.e., members of the positive class are always ranked above decoys. The accumulation curves for the 15 riboswitches investigated in the main text are provided in Fig. S\ref{fig:acc-curves} and S\ref{fig:acc-curve-summary}.
+
+\subsection*{BEDROC}
+\phantomsection       \setcurrentname{BEDROC}
+\label{methods:bedroc}
+
+
+The Boltzmann-Enhanced Discrimination of Receiver Operator Characteristic (BEDROC) modifies the Area Under the Accumulation Curve (\nameref{methods:auac}) to focus on early recognition of the positive (near-ERC) class (Fig. \ref{fig:schematic}e and \ref{fig:results}g).\cite{truchon2007evaluating} The AUAC is skewed towards late recognition since contributions from the lowest ranked samples dominate the area calculation in Eq. \ref{eq:auac}. One may introduce an exponentially decreasing weight on the rank in the AUAC calculation to focus on early recognition, i.e.,
+\begin{equation}
+    \label{eq:wauac}
+    w\mathrm{AUAC} = \int_0^1 A(r)e^{-\alpha r}dr,
+\end{equation}
+which is normalized to obtain
+\begin{equation}
+    \label{eq:bedroc}
+    \mathrm{BEDROC} = \frac{w\mathrm{AUAC} - w\mathrm{AUAC}_{\mathrm{min}}}{w\mathrm{AUAC}_{\mathrm{max}} - w\mathrm{AUAC}_{\mathrm{min}}}.
+\end{equation}
+The tunable parameter $\alpha$ controls the focus on early recognition. Our choice of $\alpha=8$ is such that the top $20\%$ of the normalized rank contributes $80\%$ of the $w\mathrm{AUAC}$. Early recognition is a suitable evaluation metric when there is a large class imbalance and accurate classification among the highest ranks is essential.
+
+\subsection*{Interaction Entropy}
+\phantomsection       \setcurrentname{Interaction Entropy}
+\label{methods:interaction-entropy}
+Interaction entropy measures how heterogeneous each nucleobase’s interaction patterns are across an ensemble of conformations. First, each nucleobase $i$ is assigned a Leontis--Westhof (LW) base-base contact classification for every structure in the ensemble.\cite{leontis2001geometric} The distribution of these classifications defines probabilities $p_i(c_j)$ for each contact $c$ with partner nucleotide $j$. The interaction entropy is then the Shannon entropy of this distribution,
+\[
+H_i = -\sum_j \sum_{c \in \mathcal{C}} p_i(c_j) \,\log_2 p_i(c_j),
+\]
+where $\mathcal{C}$ denotes the set of LW classes. Expressing the Shannon entropy in bits lends a direct interpretation: a nucleotide with interaction entropy $H$ participates in $2^{H}$ distinct base-base interactions across the ensemble (Fig. \ref{fig:ensemble-results}b). The probabilities may be computed as unweighted frequencies or with prior weights associated to each structure. In this work we use state probabilities (see \nameref{methods:state-ranking}) computed from the RNAnneal score as prior weights.
+
+\subsection*{State Ranking}
+\phantomsection       \setcurrentname{State Ranking}
+\label{methods:state-ranking}
+
+We briefly describe the procedure by which a conformational ensemble, i.e., a small number of representative conformations and their weights, is predicted by RNAnneal. We project the RNAnneal conformations onto the $d=2$ information‑bottleneck (IB) space learned by \nameref{methods:spib} to obtain latent representations $\{\mathbf{x}_0,\mathbf{x}_1,\ldots,\mathbf{x}_N\}$. We further assign the predicted state label, $y_i \in \{y_0,y_1,\ldots,y_M \}$ and \nameref{sec:rnanneal}, $s_i$, to each conformation. Next, we histogram the conformations on a $K \times L$ grid in the IB space (Fig. \ref{fig:results}j), using the mean $s$ in each bin (denoted by $\overline{{s}}_{kl}$) to define a Boltzmann‑like weight
+$w_{kl} = \exp[{-\overline{{s}}_{kl}}]$. We assign each populated bin a state label, $y_{kl}$, based on the most frequent state label of the conformations in the bin, and define a total weight, $W_i$, for state $y_i$ by $W_i = \sum_{y_{kl}=y_i} w_{kl}$. Finally, normalizing the state weights yields state probabilities $p_{yi}$, and the frame with the minimal $s_i$ within each state is taken as its representative conformation. The entire procedure is described in Algorithm \ref{alg:state-ranking}. The states predicted in the main text (Fig. \ref{fig:ensemble-results}) and supplement (Fig. S\ref{fig:rep-ensemble-1}-S\ref{fig:rep-ensemble-4}) were predicted based on a $d=2$ SPIB model trained on the first 2 PCA components of the G-vectors. 
+
+% \subsection{Structure of a Thermodynamic Map}
+
+% The structure of the map is best understood through superstatistics -- an extension of Gibbs-Boltzmann statistics where fluctuations of intensive variables are permitted. In examining $p(\mathbf{x}_1)$ as the marginal of $p(\mathbf{x}_1, \mathbf{x}_0)$ one finds
+% \begin{align}
+%     p(\mathbf{x}_1) =& \int p(\mathbf{x}_1, \mathbf{x}_0) d \mathbf{x}_0 \\
+%     =& \int p(\mathbf{x}_1| \mathbf{x}_0) r(\mathbf{x}_0) d \mathbf{x}_0 \\
+%     p(\mathbf{x}_1) = & \int \frac{\exp \left[{-U_1(\mathbf{x}_1)/U_0(\mathbf{x}_0)}\right]}{Z(\mathbf{x}_0)} r(\mathbf{x}_0) d\mathbf{x}_0
+% \end{align}
+% which amounts to Beck and Cohen's superstatistic
+% \begin{align}
+%     p(\mathbf{x}_1) =& \int_0^\infty \exp \left[ {-\beta U_1(\mathbf{x}_1)} \right] f(\beta) d\beta
+% \end{align}
+% after the change of variables
+% \begin{equation}
+%     f(\beta) = \int \frac{r(\mathbf{x}_0)}{Z(\mathbf{x}_0)} \delta\left( \beta - \frac{1}{U_0(\mathbf{x}_0)}\right) d \mathbf{x}_0.
+% \end{equation}
+% The prior is a superposition of the Gibbs-Boltzmann statistic $\exp \left[-\beta U_1(\mathbf{x}_1) \right]$ and inverse-temperatures $f(\beta)$. In superstatistics $f(\beta)$ is often modeled analytically as a gamma or log-normal distribution, but in our case the distribution is determined by the data $\mathbf{x}_0 \in \mathcal{D}$. Since our score model is trained jointly on $f(\beta)$ and $r(\mathbf{x}_0)$, one may sample $p_\theta(\mathbf{x}_0, \beta_0)$ by first sampling $\mathbf{x}_1 \propto \exp \left[ {-\beta U_1(\mathbf{x})} \right]$ and $\beta_1 \propto \exp \left(-\beta^2/2 \right)$ and then simulating the dynamics in Eq. \ref{eq:sde-bck}.
+
+
+% \lipsum[8]
+
+% \subsection*{Boltzmann-Enhanced Discrimination of Receiver Operator Characteristic (BEDROC)}
+
+% \lipsum[8]
+
+% \bibliographystyle{aip}
+\bibliography{main}
+\clearpage
+\onecolumngrid
+
+
+\section*{Supplementary Information}
+
+\begin{algorithm}[H]
+  \caption{Sampling RNA secondary structures with \texttt{EternaFold}}
+  \label{alg:eternafold-sampling}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{example.fa} (input sequence);\\
+    \texttt{N} (maximum number of samples, \texttt{5000})
+    \STATE \texttt{mkdir -p eternafold}
+    \STATE \texttt{EternaFold/src/contrafold sample example.fa} \\
+    \ \texttt{--params EternaFold/parameters/EternaFoldParams.v1} \\
+    \ \texttt{--nsamples N > eternafold/ef.ss}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Sampling RNA secondary structures with \texttt{LinearFold}}
+  \label{alg:linearfold-sampling}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{example.fa} (input sequence)
+    \STATE \texttt{mkdir -p linearfold-v}
+    \COMMENT {Vienna parameters}
+    \STATE \texttt{mkdir -p linearfold-c}
+    \COMMENT {CONTRAfold parameters}
+    \STATE \texttt{cat example.fa | linearfold --zuker --delta 1000 -V | tail -n +5 | awk '\{print \$1\}' > linearfold-v/zuker.ss} \\
+    \STATE \texttt{cat example.fa | linearfold --zuker --delta 1000       | tail -n +5 | awk '\{print \$1\}' > linearfold-c/zuker.ss}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Sampling RNA secondary structures with \texttt{LinearAliFold}}
+  \label{alg:linearalifold-sampling}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{example.fa} (input sequence);\\
+    \texttt{N} (maximum number of samples, \texttt{20000})
+    \STATE \texttt{mkdir -p linearalifold-v}
+    \COMMENT {Vienna parameters}
+    \STATE \texttt{mkdir -p linearalifold-bl}
+    \COMMENT {BL* parameters}
+
+    \STATE \texttt{cat example.fa | linearalifold.py -s N -e 1 > linearalifold-v/stochastic.ss}
+    \STATE \texttt{cat example.fa | linearalifold.py -s N -e 2 > linearalifold-bl/stochastic.ss}
+    \STATE \texttt{cat example.fa | linearalifold.py -p -B linearalifold-v/bpp.txt -M linearalifold-v/mea.ss -T linearalifold-v/threshknot.ss -C linearalifold-v/centroid.ss -e 1}
+    \STATE \texttt{cat example.fa | linearalifold.py -p -B linearalifold-bl/bpp.txt -M linearalifold-bl/mea.ss -T linearalifold-bl/threshknot.ss -C linearalifold-bl/centroid.ss -e 2}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Conformational sampling with FARFAR2}
+  \label{alg:rna_denovo}
+  \begin{algorithmic}[1]
+  \REQUIRE \texttt{SEQ} (input sequence);\\
+  \texttt{DB} (secondary structure in dot-bracket notation)
+    \STATE \texttt{rna\_denovo.default.linuxgccrelease} \\
+    \ \texttt{-sequence SEQ} \COMMENT {From \texttt{example.fa} in Algorithms \ref{alg:eternafold-sampling}-\ref{alg:linearalifold-sampling}} \\
+    \ \texttt{-secstruct DB} \COMMENT {\texttt{cat */*.ss | uniq} from Algorithms \ref{alg:eternafold-sampling}-\ref{alg:linearalifold-sampling}}\\
+    \ \texttt{-nstruct 1} \\
+    \ \texttt{-cycles 20000} \\
+    \ \texttt{-minimize\_rna true} \\
+    \ \texttt{-rna:denovo:rounds 10} \\
+    \ \texttt{-rna:denovo:minimize:minimize\_bps true} \\
+    \ \texttt{-rna:denovo:bps\_moves true}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Reference conformation preparation with FARFAR2}
+  \label{alg:farfar-minimise}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{SEQ} (input sequence);\\
+    \texttt{REF} (reference PDB file)
+    \STATE \texttt{rna\_denovo.default.linuxgccrelease} \\
+    \ \texttt{-sequence \$(echo \$SEQ)} \COMMENT{lower‑case sequence} \\[-0.2em]
+    \ \texttt{-secstruct '.....'} \COMMENT{all bases unpaired; equal to length of \texttt{\$SEQ}} \\[-0.2em]
+    \ \texttt{-nstruct 1} \\[-0.2em]
+    \ \texttt{-out:file:silent \$(dirname \$REF)/silent.out} \\[-0.2em]
+    \ \texttt{-s \$REF} \COMMENT{experimental model} \\[-0.2em]
+    \ \texttt{-minimize\_rna true} \\[-0.2em]
+    \ \texttt{-rna:denovo:rounds 1} \\[-0.2em]
+    \ \texttt{-out:overwrite true} \\[-0.2em]
+    \ \texttt{-cycles 10000} \\[-0.2em]
+    \ \texttt{-rna:denovo:minimize:minimize\_bps true}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Unsupervised selection of diverse candidate conformations}
+  \label{alg:candidate-selection}
+  \begin{algorithmic}[1]
+    \REQUIRE FARFAR2 models $\{\mathbf{x}_i\}_{i=1}^{N}$; \\
+    Density‐peaks parameter $Z{=}3$;\\
+    Principal component range $d\!=\!2,3\ldots\,26$;\\
+    Target count $K{=}200$
+    \STATE Featurize each model $\mathbf{x}_i$ into a G-vector
+    \FOR{$d \in \{2,3,\dots,26\}$}
+      \STATE Project all G-vectors onto the first $d$ principal components
+      \STATE Cluster the projection with \texttt{dadapy} (advanced density peaks, $Z{=}3$)
+      \STATE Record the number of clusters obtained
+    \ENDFOR
+    \STATE Let $d^\ast$ be the dimension giving the maximum cluster count \COMMENT{see Fig.\,S\ref{fig:clusters_vs_d}}
+    \STATE Re-cluster the $d^\ast$-dimensional data to obtain $\{\mathcal{C}_j\}_{j=1}^{M}$
+    \FORALL{clusters $\mathcal{C}_j$}
+      \STATE Sort conformations in $\mathcal{C}_j$ by ascending Rosetta score
+    \ENDFOR
+    \STATE Sort the clusters by the best Rosetta score among all conformations in each cluster
+    \STATE $\mathcal{S} \leftarrow \varnothing$ \COMMENT{set of selected candidates}
+    \WHILE{$|\mathcal{S}| < K$}
+      \FOR{$j = 1$ \TO $M$}
+        \IF{$\mathcal{C}_j \neq \varnothing$}
+          \STATE Remove the top-scoring conformation $c$ from $\mathcal{C}_j$ and add $c$ to $\mathcal{S}$
+          \IF{$|\mathcal{S}| = K$}
+            \STATE \textbf{break}
+          \ENDIF
+        \ENDIF
+      \ENDFOR
+      \STATE Re-sort clusters by their current top-scoring conformation
+    \ENDWHILE
+    \RETURN $\mathcal{S}$ \COMMENT{200 candidate conformations}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Likelihood estimation for a thermodynamic map (diffusion model) using the Hutchinson trace estimator}
+  \label{alg:diffusion-likelihood}
+  \begin{algorithmic}[1]
+    \REQUIRE Observed frame $\mathbf{u}_{0}\equiv (\mathbf{x}_0, U_0)^\top$ (data at $t_0\equiv t={0}$); \\
+    Diffusion process $\mathcal{D}$ with time grid $\{t_{0}\!\!<\!\!t_{1}\!\!<\!\!\dots\!\!<\!\!t_{K}\}$; \\
+    One–step map $\mathrm{STEP}_{t_{k}\!\rightarrow t_{k+1}} \colon \mathbf{u}\!\mapsto\!\mathbf{u}'$; \COMMENT{Neural network} \\
+    Prior temperature $T$; \COMMENT{$T=1$ unless otherwise stated} \\
+    Temperature-dependent prior density $q_T(\mathbf{u}_{t_K})\equiv \mathcal{N}(0,T) \times \mathcal{N}(0,1)$; \COMMENT{Different priors for $\mathbf{x}$ and $U$} \\
+    Schedule of noise scales $\{\beta_{k}\}_{k=1}^{K}$; \\
+    Number of Hutchinson probe vectors $M$
+    \STATE $\mathbf{u}\leftarrow\mathbf{u}_{0}$  \COMMENT{state at the current time $t_{k}$}
+    \STATE $\mathcal{G}\leftarrow[\,]$          \COMMENT{to store divergence $g_{k}$}
+    \FOR{$k\;=\;0\;\mathbf{to}\;K-1$}
+      \STATE Draw $M$ probe vectors
+             $\bigl\{\mathbf{v}^{(m)}\bigr\}_{m=1}^{M}
+                    \sim\mathcal{N}\bigl(\mathbf{0},\mathbf{I}\bigr)$
+      \FORALL{probes $m=1,\dots,M$}
+        \STATE $(\mathbf{u}'^{(m)},\mathbf{Jv}^{(m)})\;
+               \leftarrow\;
+               \mathrm{JVP}\Bigl(
+                 \mathrm{STEP}_{t_{k}\!\rightarrow t_{k+1}},
+                 \mathbf{u},\,
+                 \mathbf{v}^{(m)}
+               \Bigr)$ \COMMENT{Jacobian‐vector product}
+      \ENDFOR
+      \STATE $\displaystyle
+             g_{k}\;\leftarrow\;
+             \frac{1}{M}
+             \sum_{m=1}^{M}
+               \bigl\langle
+                 \mathbf{Jv}^{(m)},\,\mathbf{v}^{(m)}
+               \bigr\rangle$
+             \COMMENT{Hutchinson trace estimate of $\nabla_{\!\mathbf{u}}\!\cdot\!\mathrm{STEP}$}
+      \STATE Append $g_{k}$ to $\mathcal{G}$
+      \STATE $\mathbf{u}\leftarrow\mathbf{u}'^{(1)}$ \COMMENT{all probes have the same output}
+    \ENDFOR
+
+    \STATE $\displaystyle
+           \Delta \l_{pq}
+           \leftarrow
+           \operatorname{trapz}\bigl(\mathcal{G},\,
+                                    \{\beta_{k}\}_{k=1}^{K}\bigr)$
+           \COMMENT{trapezoidal integration on $(g_{k},\beta_{k})$}
+    \STATE $\displaystyle
+           \log q
+           \leftarrow
+           \log q_T\bigl(\mathbf{u}\bigr)$
+           \COMMENT{prior log‐density at $t_{K}$ at temperature $T$}
+    \STATE $\displaystyle
+           \log p_{\theta}\bigl(\mathbf{u}_{0}\bigr)
+           \leftarrow
+           \log q + \Delta_{pq}$
+    \RETURN $\log p_{\theta}(\mathbf{u}_{0})$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{RNAnneal Score}
+  \label{alg:rnanneal-score}
+  \begin{algorithmic}[1]
+    \REQUIRE  
+    Log-likelihoods $\{L_{i}^{(\mathcal{F})}\}$;\\
+    Feature sets $\mathcal{F}=\{\text{G-vector},\text{R-vector}\}\times\{\text{PCA},\text{SPIB}\}$;\\
+    Component range $\mathcal{D}=2,3,\ldots,8$
+
+    \STATE $\displaystyle L_{\min}\leftarrow\min_{i}L_{i}$,\quad 
+           $\displaystyle\sigma_{L}\leftarrow\sqrt{\operatorname{Var}\{L_{i}\}}$
+    \FORALL{frames $i$}
+      \STATE $\displaystyle l_{i}\;\leftarrow\;
+              {\bigl(L_{i}-L_{\min}\bigr)}\;
+              {/\;\sigma_{L}}$ \COMMENT{subtract min and divide by SD}
+    \ENDFOR
+      \STATE Sort $\{l_{i}\}$ in ascending order
+      \STATE Initialize lists $\mathcal{S} = [\,]$ and $\mathcal{L} = [\,]$
+    \FORALL{confrmers $i$}
+    
+        \STATE $\mathcal{L}(i)\gets[\,]$
+        \FORALL{feature-projection pairs $(v,f)\in\mathcal{F}$}
+          \FORALL{dimensions $d\in\mathcal{D}$}
+              \STATE Append $l_{i}^{(v,f,d)}$ to $\mathcal{L}(i)$
+            \ENDFOR
+          \ENDFOR
+        \STATE Append {$\displaystyle\bar{s}_{i}
+               = \frac{1}{|\mathcal{L}(i)|}\sum_{l\in\mathcal{L}(i)}l$} to ${\mathcal{S}}(i)$
+               \COMMENT{{RNAnneal Score}}
+       
+      \ENDFOR
+      \RETURN ${\mathcal{S}}(i)$
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+  \caption{Interaction Entropy calculation}
+  \label{alg:interaction-entropy}
+  \begin{algorithmic}[1]
+    \REQUIRE Ensemble of conformations $\{X_{1},\dots,X_{M}\}$;\\
+             Nucleotides $i=1,\dots,N$; \\
+             Prior weights $\{w_{1},\dots,w_{M}\}$ with $\sum_{j} w_{j}=1$; \\
+             LW classification function $\mathrm{LW}(i,X_{j}) \rightarrow c \in \mathcal{C}$.
+    \FORALL{nucleotides $i=1,\dots,N$}
+      \STATE Initialize frequency table $f_{i}(c) \gets 0$ for all $c \in \mathcal{C}$
+      \FORALL{conformations $j=1,\dots,M$}
+        \STATE $c \gets \mathrm{LW}(i,X_{j})$
+        \STATE $f_{i}(c) \gets f_{i}(c) + w_{j}$
+      \ENDFOR
+      \STATE $p_{i}(c) \gets f_{i}(c) / \sum_{c' \in \mathcal{C}} f_{i}(c')$ \COMMENT{Normalize}
+      \STATE $H_{i} \gets -\sum_{c \in \mathcal{C}} p_{i}(c) \log_2 p_{i}(c)$
+    \ENDFOR
+    \RETURN $\{H_{i}\}_{i=1}^{N}$ \COMMENT{interaction entropies for all nucleotides}
+  \end{algorithmic}
+\end{algorithm}
+
+
+
+
+\begin{algorithm}[H]
+  \caption{Boltzmann‑weighted state ranking and representative selection}
+  \label{alg:state-ranking}
+  \begin{algorithmic}[1]
+    \REQUIRE\ SPIB projections $\{\mathbf{x}_{i}\}$;\\
+    State labels $\{y_{i}\}$;\\
+    RNAnneal scores $\{s_{i}\}$;\\ Frame keys $\{f_{i}\}$;\\ Histogram grid size $(K=25,L=25)$;\\ Minimum population $N_{\min}=10$;\\ Pre‑filter count $k_{\mathrm{top}}=10$;\\ Report count $k_{\mathrm{rep}}=10$
+    \STATE $\mathcal{F}\!\leftarrow\!\{(y_{i},\mathbf{x}_{i},s_{i},f_{i})\}$ 
+    \STATE Group $\mathcal{F}$ by state label to obtain $\{\mathcal{F}_y\}$
+    \STATE Discard states with $|\mathcal{F}_y|<N_{\min}$
+    \STATE Compute the average score $\bar{s}_y $ for every surviving state
+    \STATE Keep the $k_{\mathrm{top}}$ states with the lowest $\bar{s}_y$
+    \STATE Initialise histogram $H$ on an $K\times L$ grid over 2D IB space
+    \FORALL{frames $(y,\mathbf{x},s,f)\in\bigcup\mathcal{F}_y$}
+      \STATE Increment $H$ at the bin containing $\mathbf{x}$ with $(s,y)$
+    \ENDFOR
+    \FORALL{occupied bins $(k,l)$}
+      \STATE $\bar{s}_{kl}\!\leftarrow\!\text{mean score in bin }(k,l)$
+      \STATE $w_{kl}\!\leftarrow\!\exp(-\bar{s}_{kl})$ \COMMENT{Boltzmann weight in bin $h_{kl}$}
+      \STATE $y^\ast\!\leftarrow\!\arg\max_y\{\text{count of }y\text{ in }(k,l)\}$ \COMMENT{State assigned to bin $h_{kl}$}
+      \STATE $W_{y^\ast}\!\leftarrow\!W_{y^\ast}+w_{kl}$ \COMMENT{Each bin $h_{kl}$ with state $y^\ast$ contributes $w_{kl}$ to the total state weight $W_{y^\ast}$}
+    \ENDFOR
+    \STATE $p_y\!\leftarrow\!W_y\,/\,\sum_{y'}W_{y'}$ \COMMENT{Normalize weights}
+    \STATE Order states by $p_y$ (descending) to obtain $(y_{(1)},\dots,y_{(k_{\mathrm{rep}})})$
+    \FOR{$r=1$ \TO $k_{\mathrm{rep}}$}
+      \STATE $y\!\leftarrow\!y_{(r)}$
+      \STATE $\mathcal{F}_y\!\leftarrow\!\{(s,f)\in\mathcal{F}_y\}$
+      \STATE $f^\ast\!\leftarrow\!\arg\min_{(s,f)\in\mathcal{F}_y}\{s\}$ \COMMENT{representative frame}
+      
+      \STATE Record $\bigl(r,y,p_y,f^\ast\bigr)$
+    \ENDFOR
+    \RETURN\ Table of the $k_{\mathrm{rep}}$ most‑probable states with their representatives
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=0.7\textwidth
+    ]{./all-representatives.png}
+    \caption{{\bf Riboswitch reference ERCs labeled with PDB accession code.}}
+    \label{fig:all-representatives}%
+\end{figure*}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=0.9\textwidth
+    ]{./stack-wc-nwc.png}
+    \caption{{\bf Interaction Network Fidelity (INF) by interaction type.} The INF is reported for {\textbf{a}.} stacking interactions (Median [IQR]; Ref. MD: 0.82 [$0.79-0.86$]; RNAnneal: 0.85 [$0.80-0.87$]),  {\textbf{b}.} Watson-Crick (WC) interactions (Ref. MD: 0.95 [$0.93-0.96$]; RNAnneal: 0.98 [$0.92-1.0$]), {\textbf{c}.} non-Watson-Crick (nWC) interactions (Ref. MD: 0.62 [$0.48-0.67$]; RNAnneal: 0.80 [$0.59-0.87$]). It is worth noting that the conformation with, e.g., the maximum $\mathrm{INF_{WC}}$, does not necessarily have the maximum $\mathrm{INF_{stack}}$ or $\mathrm{INF_{nWC}}$.}
+    \label{fig:inf-detailed}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./sec-struct-all.png}
+    \caption{{\bf Evaluation of secondary structures predicted by EternaFold, LinearFold, and LinearAlifold.} Secondary structures sampled by Eternafold, LinearFold, and LinearAilfold are compared to the reference secondary structure extracted from the listed PDB entry; $n$ denotes the total number of secondary structures sampled.}
+    \label{fig:sec-struct-eval}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./clusters_vs_d.png}
+    \caption{{\bf Number of clusters vs d.} For each RNA, the G-vectors are projected onto $d$ components, and clustering is performed via the Advanced Density Peaks algorithm implemented in \texttt{dadapy}. The number of clusters, $N_c$ is recorded as a function of $d$. The star values and vertical line indicate the $d$ where $N_c$ is maximized; $n$ denotes the total number of models used in the calculation.}
+    \label{fig:clusters_vs_d}%
+\end{figure}
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./rmsd_reference.png}
+    \caption{{\bf RMSD variation over a 100ns MD simulation launched from the reference conformation.} The dashed line placed at $5${\AA} indicates the cutoff used to classify ERCs (RMSD$\leq5${\AA}) and decoys (RMSD $>5${\AA}) conformations. The proportion of ERCs is provided underneath the PDB accession code.}
+    \label{fig:rmsd_reference}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./rmsd_decoys.png}
+    \caption{{\bf RMSD distribution of conformations sampled by RNAnneal.} The dashed line placed at $5${\AA} indicates the cutoff used to classify ERCs (RMSD $\leq5${\AA}) and decoys (RMSD $>5${\AA}) conformations. The proportion of near-ERCs is provided underneath the PDB accession code.}
+    \label{fig:rmsd_decoys}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./rmsd_combined.png}
+    \caption{{\bf RMSD distribution of conformations for the classification task.} The classification task merges structures sampled by RNAnneal with frames from simulations launched from the reference conformations (i.e., merges Fig. S\ref{fig:rmsd_reference} and S\ref{fig:rmsd_decoys}). The dashed line placed at $5${\AA} indicates the cutoff used to classify ERC (RMSD $\leq5${\AA}) and decoy (RMSD$>5${\AA}) conformations. The proportion of near-ERCs is provided underneath the PDB accession code.}
+    \label{fig:rmsd_combined}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./inf_reference.png}
+    \caption{{\bf INF variation over a 100ns MD simulation launched from the reference conformation.} The dashed line placed at $0.85$ indicates the cutoff used to classify ERC (INF$\geq$0.85) and decoy (INF$<$0.85) conformations. The proportion of near-ERCs is provided underneath the PDB accession code.}
+    \label{fig:inf_reference}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./inf_decoys.png}
+    \caption{{\bf INF distribution of conformations generated by RNAnneal.} The dashed line placed at $0.85$ indicates the cutoff used to classify ERC (INF$\geq$0.85) and decoy (INF$<$0.85) conformations. The proportion of near-ERCs is provided underneath the PDB accession code.}
+    \label{fig:inf_decoys}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./inf_combined.png}
+    \caption{{\bf INF distribution of conformations for the classification task.} The classification task merges structures sampled by RNAnneal with frames from simulations launched from the reference conformations (i.e., merges Fig. S\ref{fig:inf_reference} and S\ref{fig:inf_decoys}). The dashed line placed at $0.85$ indicates the cutoff used to classify ERC (INF$\geq$0.85) and decoy (INF$<$0.85) conformations. The proportion of near-ERCs is provided underneath the PDB accession code.}
+    \label{fig:inf_combined}%
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=0.4\textwidth
+    ]{./correlation.png}
+    \caption{{\bf Correlation between RMSD and INF for RNAnneal conformations.}}
+    \label{fig:correlation}%
+\end{figure}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=0.9\textwidth
+    ]{./auac-bedroc-by-feature.png}
+    \caption{{\bf AUAC and BEDROC for each combination of training features.}}
+    \label{fig:classification-by-feature}%
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./rmsd-enrichment.png}
+    \caption{{\bf AUAC and BEDROC for RMSD classification criteria.} Classification power of the Rosetta (blue), DES-AMBER (orange), and RNAnneal (blue) scores when ERCs are defined as conformations $<5${\AA} in RMSD from the reference conformation. The gray boxplots show the distribution of AUAC and BEDROC values for each model in the TM ensemble.}
+    \label{fig:rmsd-enrichment}%
+\end{figure*}
+
+\begin{figure}
+    \centering
+    \includegraphics[
+    width=0.9\textwidth
+    ]{./enrichment-temperature-dependence.png}
+    \caption{{\bf Variation in AUAC and BEDROC with scoring temperature.}}
+    \label{fig:model-temp-dependence}%
+\end{figure}
+
+% \begin{figure*}
+%     \centering
+%     \includegraphics[
+%     width=0.75\textwidth
+%     ]{./auac-bedroc-temperature-analysis.png}
+%     \caption{{\bf The effect of model temperature on AUAC and BEDROC} (a) The correlation between AUAC and BEDROC values and model temperature $T \in \{0.1, 0.5, 1.0, 1.5, 2.0, 2.5\}$ is reported. For all but three RNAs increasing temperature linearly decreases AUAC and BEDROC. (b) The difference in AUAC and BEDROC at the minimum and maximum model temperature is reported. The AUAC and BEDROC value generally decreases as the temperature is raised.}
+%     \label{fig:model-temperature}%
+% \end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./accum_curves_inf.png}
+    \caption{{\bf Accumulation Curves.} Accumulation curves, $A(r)$ are reported for each riboswitch, identified by the PDB entry of the reference conformation.}
+    \label{fig:acc-curves}%
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./accumulation-curve-summary.png}
+    \caption{{\bf Summary of Accumulation Curves} \textbf{a.} The set of accumulation curves for each riboswitch PDB is shown with the range of rank, $r$, for which $A(r)=0.25$, $A(r)=0.50$, and $A(r)=0.75$. \textbf{b.} The range indicated by the bars shows the variation of $r$ with temperature at fixed values of $A(r)=0.25$, $A(r)=0.50$, and $A(r)=0.75$. The accumulation curve for the NAD$^{+}$ riboswitch (6E1W\cite{Numata2019}) is shown as an example (see Fig. S\ref{fig:acc-curves} for all riboswitches).   }
+    \label{fig:acc-curve-summary}%
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./IE-rep-ensemble-1.png}
+    \caption{{\bf Conformational ensembles predicted by RNAnneal (2MXS, 3Q3Z\cite{Smith2010}, 4NYA\cite{Warner2014}, 4RUM\cite{Ramesh2014})}. The reference ERC for each RNA are depicted to the left. The five most probable states are reported alongside their probabilities. The best scoring model from each state is shown as a representative conformation, and the INF and RMSD values compared to the ERC are reported. Nucleotides are colored based on the interaction entropy (IE) predicted by RNAnneal according to the ranges marked in Fig. \ref{fig:ensemble-results}b (dark blue: $0 \leq \mathrm{IE} < 0.5$; light blue: $0.5 \leq \mathrm{IE} < 1.5$; yellow: $1.5 \leq \mathrm{IE} < 2.5$; red: $ \mathrm{IE} \geq 2.5$)}
+    \label{fig:rep-ensemble-1}%
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./IE-rep-ensemble-2.png}
+    \caption{{\bf Conformational ensembles predicted by RNAnneal (4YAZ\cite{ren2015structural}, 6C27\cite{Grigg2018}, 6CB3\cite{Bachas2018}, 6DLQ\cite{Peselis2018})}. The reference ERC for each RNA are depicted to the left. The five most probable states are reported alongside their probabilities. The best scoring model from each state is shown as a representative conformation, and the INF and RMSD values compared to the ERC are reported. Nucleotides are colored based on the interaction entropy (IE) predicted by RNAnneal according to the ranges marked in Fig. \ref{fig:ensemble-results}b (dark blue: $0 \leq \mathrm{IE} < 0.5$; light blue: $0.5 \leq \mathrm{IE} < 1.5$; yellow: $1.5 \leq \mathrm{IE} < 2.5$; red: $ \mathrm{IE} \geq 2.5$)}
+    \label{fig:rep-ensemble-2}%
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./IE-rep-ensemble-3.png}
+    \caption{{\bf Conformational ensembles predicted by RNAnneal (6E1W\cite{Numata2019}, 6N2V\cite{Price2018}, 6Q57\cite{Dunstan2018}, 6QN3\cite{Huang2019})}. The reference ERC for each RNA are depicted to the left. The five most probable states are reported alongside their probabilities. The best scoring model from each state is shown as a representative conformation, and the INF and RMSD values compared to the ERC are reported. Nucleotides are colored based on the interaction entropy (IE) predicted by RNAnneal according to the ranges marked in Fig. \ref{fig:ensemble-results}b (dark blue: $0 \leq \mathrm{IE} < 0.5$; light blue: $0.5 \leq \mathrm{IE} < 1.5$; yellow: $1.5 \leq \mathrm{IE} < 2.5$; red: $ \mathrm{IE} \geq 2.5$)}
+    \label{fig:rep-ensemble-3}%
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[
+    width=\textwidth
+    ]{./IE-rep-ensemble-4.png}
+    \caption{{\bf Conformational ensembles predicted by RNAnneal (6TFF\cite{Huang2020}, 6UBU\cite{Matyjasik2019}, 6WJR\cite{Wilt2020}, and 6VMY\cite{Chan2020})}. The reference ERC for each RNA are depicted to the left. The five most probable states are reported alongside their probabilities. The best scoring model from each state is shown as a representative conformation, and the INF and RMSD values compared to the ERC are reported. Nucleotides are colored based on the interaction entropy (IE) predicted by RNAnneal according to the ranges marked in Fig. \ref{fig:ensemble-results}b (dark blue: $0 \leq \mathrm{IE} < 0.5$; light blue: $0.5 \leq \mathrm{IE} < 1.5$; yellow: $1.5 \leq \mathrm{IE} < 2.5$; red: $ \mathrm{IE} \geq 2.5$)}
+    \label{fig:rep-ensemble-4}%
+\end{figure*}
+
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{@{} l c c c c c c @{}}
+    \toprule
+    \textbf{RNA} 
+      & \textbf{PDB} 
+      & \makecell[l]{\textbf{Monomer}}
+      % & \textbf{Apo/Holo}
+      & \makecell[l]{\textbf{State}}
+      & \textbf{Length} 
+      & \textbf{Sequence} 
+      & \textbf{Secondary Structure} \\
+    \midrule
+    
+    \addlinespace[0.5em]
+
+
+    % first row
+    \makecell[l]{Neomycin \\ sensing \\ riboswitch}
+    & 2MXS\cite{Schmidtke2015}
+    & Y
+    & Holo
+    & 28
+    & \makecell[l]{%
+          \texttt{ggcugcuuguccuuuaaugguccaguc}
+        }
+    & \makecell[l]{
+      \texttt{(.(((...(.((......)).)))).)}
+      } \\
+
+    \addlinespace[0.5em]
+
+    % second row
+    \makecell[l]{c‑di‑GMP‑II \\ riboswitch}
+    & 3Q3Z\cite{Smith2010}
+    & Y
+    & Holo
+    & 76
+    & \makecell[l]{%
+          \texttt{gcgcggaaacaaugaugaauggguuuaaau}  \\
+          \texttt{ugggcacuugacucauuuugaguuaguagu} \\
+          \texttt{gcaaccgaccgugcu}
+          }
+    & \makecell[l]{
+      \texttt{((.(((..((.......((((.((......}\\
+      \texttt{[\{\{[[[[[..)).))))....))....]]]}\\
+      \texttt{]]].\}\}..))).)).}
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{TPP \\ riboswitch}
+    & 4NYA\cite{Warner2014}
+    & Y
+    & Holo
+    & 81
+    & \makecell[l]{%
+          \texttt{ggacucggggugcccuucugcgugaaggcu} \\
+          \texttt{gagaaauacccguaucaccugaucuggaua} \\ 
+          \texttt{augccagcguagggaaguuc} \\
+        }
+      
+    & \makecell[l]{
+    \texttt{(.(((((((.((((.(((.....)))))).}\\
+    \texttt{.....)..)))).....(((...((((...}\\
+    \texttt{...))))...)))..))).)}
+      }
+      \\
+
+        \addlinespace[0.5em]
+
+    \makecell[l]{NiCo \\ transition\\-metal \\ riboswitch}
+    & 4RUM\cite{Warner2014}
+    & Y
+    & Holo
+    & 93
+    & \makecell[l]{%
+          \texttt{gggaacugagcaggcaaugaccagagcggu} \\
+          \texttt{caugcagccgggcugcgaaagcggcaacag} \\
+          \texttt{augauacacgcacaucugugggacaguucc} \\
+          \texttt{ca}
+        }
+
+    & \makecell[l]{
+    \texttt{((((((((..(.(((.((((((.....)))} \\
+    \texttt{)))...)))..((.((....)).)).((((} \\
+    \texttt{(((.........)))))))..).)))))))} \\
+    \texttt{).}
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+        \makecell[l]{3',3'-cGAMP \\ sensing \\ riboswitch}
+    & 4YAZ\cite{ren2015structural}
+    & Y
+    & Holo
+    & 84
+    & \makecell[l]{%
+          \texttt{gguacacgacaauacuaaaccauccgcgag} \\
+          \texttt{gauggggcggaaagccuaagggucucccug} \\
+          \texttt{agacagccgggcugccgaaauauc}
+        }
+
+    & \makecell[l]{
+    \texttt{(.((..((......(....((((((....)} \\
+    \texttt{)))))..[.)...(((...(((((((...)} \\
+    \texttt{)))).])).)))...))...)).)} \\
+    }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{SAM-III \\ riboswitch}
+    & 6C27\cite{Grigg2018}
+    & Y
+    & Apo
+    & 48
+    & \makecell[l]{%
+          \texttt{gggacaaguucccgaaaggauggcggaaac} \\
+          \texttt{gccagaugccuuguccc} \\
+        }
+
+    & \makecell[l]{
+    \texttt{.(((((((.(.(.....).)(.((......} \\
+    \texttt{)).).....))))))).} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{YkoY\\riboswitch}
+    & 6CB3\cite{Bachas2018}
+    & N
+    & Holo
+    & 100
+      & \makecell[l]{%
+          \texttt{aaaggggaguagcgucgggaaaccgaaaca} \\
+          \texttt{aagucgucaauucgugaggaaacucaccgg} \\
+          \texttt{cuuuguugacauacgaaaguauguuuagca} \\
+          \texttt{agaccuuuc} \\
+        }
+      & \makecell[l]{
+    \texttt{.((((......((.((((....))))((((} \\
+    \texttt{(((.((.......(((((....))))))).} \\
+    \texttt{))))))).((((((....))))))...)).} \\
+    \texttt{...))))..} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{PRPP \\ riboswitch}
+    & 6DLQ\cite{Peselis2018}
+    & Y
+    & Holo
+    & 108
+    & \makecell[l]{%
+          \texttt{ggaaagugugucuaggguuccgcgugcuuc} \\
+          \texttt{ggcacggacugguccaagugacacagacgc} \\
+          \texttt{auucgugcguuacaccggagggauagaagc} \\
+          \texttt{ccaggcggguagguuuc} \\
+        }
+    & \makecell[l]{
+    \texttt{..((...(((((..((...((.(((((...} \\
+    \texttt{.)))))....)).))....)))))..((((} \\
+    \texttt{(....)))))..(.[[[..(((.......)} \\
+    \texttt{)).).]]]......)).} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{PreQ1 \\ riboswitch}
+    & 6E1W\cite{Numata2019}
+    & Y
+    & Holo
+    & 31
+    & \makecell[l]{%
+          \texttt{cugggucgcaguuuccccaguuaacaaaac}
+        }
+    & \makecell[l]{
+    \texttt{(((((.....[....))))).........]}
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{Mn$^{2+}$-\\sensing \\ riboswitch}
+    & 6N2V\cite{Price2018}
+    & Y
+    & Holo
+    & 99
+    & \makecell[l]{%
+          \texttt{gcuuggggaguagccugcuuucggaaacga} \\
+          \texttt{aagcgccuguaucaacauacucggcgaaag} \\
+          \texttt{ccguggugcaggaccgaaaggucuggcgag} \\
+          \texttt{accaggcc}
+        }
+
+    & \makecell[l]{
+    \texttt{.(.(((......(((..(.((((....)))} \\
+    \texttt{).)..((((.(.((.......((((....)} \\
+    \texttt{))))).).))))(((....)))..)))...} \\
+    \texttt{.))).)..} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{Tetrahydro-\\folate \\ riboswitch}
+    & 6Q57\cite{Dunstan2018}
+    & Y
+    & Holo
+    & 90
+    & \makecell[l]{%
+          \texttt{ggagaguagaugauucgcguuaagugugug} \\
+          \texttt{ugaaugggaugucgucacacaacgaagcga} \\
+          \texttt{gagcgcggugaaucauugcauccgcucca} \\
+        }
+      
+    & \makecell[l]{
+    \texttt{.(((......((((((.((.......((((} \\
+    \texttt{(((...[[[[[...)))))))....((...} \\
+    \texttt{.)).))..))))))...]]]]].)))..} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{Glutamine \\ II riboswitch}
+    & 6QN3\cite{Huang2019}
+    & N
+    & Holo
+    & 51
+    & \makecell[l]{%
+          \texttt{cguucacccuucggggcgcaugaaauggga} \\
+          \texttt{guagggaacgggauucucau}
+        }
+    & \makecell[l]{
+    \texttt{......(((....)))........(.(.((} \\
+    \texttt{.(..........).)).).)} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{NAD$^{+}$ \\ riboswitch}
+    & 6TFF\cite{Huang2020}
+    & Y
+    & Holo
+    & 53
+    & \makecell[l]{%
+          \texttt{ggcuucaacaaccccguagguugggccgaa} \\
+          \texttt{aggcagcgaaucuacuggagcc}
+        }
+    & \makecell[l]{
+    \texttt{((((.((.....[[.((((.(((.(((...} \\
+    \texttt{.))).]]))).)))))).))))} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{Guanine\\ riboswitch}
+    & 6UBU\cite{Matyjasik2019}
+    & Y
+    & Holo
+    & 68
+    & \makecell[l]{%
+          \texttt{ggacauauaaucgcguggauauggcacgca} \\
+          \texttt{aguuucuaccgggcaccguaaauguccgac} \\
+          \texttt{uaugucc}
+        }
+
+    & \makecell[l]{
+    \texttt{((((((((..(.(((((.....[[))))).} \\
+    \texttt{)[.....)](((.((]].....)).)))..} \\
+    \texttt{)))))))} \\
+      }
+      \\
+
+    \addlinespace[0.5em]
+
+    \makecell[l]{FMN \\ riboswitch}
+    & 6WJR\cite{Wilt2020}
+    & Y
+    & Apo
+    & 112
+    & \makecell[l]{%
+          \texttt{ggaucuucggggcagggugaaauucccgac} \\
+          \texttt{cggugguauaguccacgaaaguauuugcuu} \\
+          \texttt{ugauuuggugaaauuccaaaaccgacagua} \\
+          \texttt{gagucuggaugagagaagauu}
+        }
+    & \makecell[l]{
+    \texttt{..((((((.......((.......))..((} \\
+    \texttt{((((((....[[))))..(((......)))} \\
+    \texttt{...(((((.......)))))]])).[[[..} \\
+    \texttt{..))]]].......)))))).} \\
+      }
+      \\
+    
+    \addlinespace[0.5em]
+
+    \makecell[l]{Cobalamin \\ riboswitch}
+    & 6VMY\cite{Chan2020}
+    & Y
+    & Holo
+    & 149
+    & \makecell[l]{%
+          \texttt{ggucaaauaggugccgguccgugaacaaca} \\
+          \texttt{gccggcuuaaaagggaaaccgguaaaagcc} \\
+          \texttt{ggugcggucccgccacuguaauuggccaag} \\
+          \texttt{cgccaagagccaggauaccugccuguuuga} \\
+          \texttt{ucagcacgaauucugcgaggacagauga}
+        }
+    & \makecell[l]{
+    \texttt{(.((.((.(((.(((((..[((.....)).} \\
+    \texttt{.))))).....(((....((((......))} \\
+    \texttt{)).((((.....)).[[[....((((....} \\
+    \texttt{.))))...))]]]]...))).))).)).))} \\
+    \texttt{.)..(.....((........).)...).} \\
+      }
+      \\
+
+
+    \bottomrule
+  \end{tabular}
+  \caption{Details of riboswitch sequences and reference conformations}
+  \label{tab:riboswitches}
+\end{table}
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Stage} & \textbf{Duration (ps)} & \textbf{Timestep (fs)} & \textbf{Temperature (K)} \\
+    \midrule
+    Equilibration 1   &     1    &  0.1 &   1   \\
+    Equilibration 2.1 &     1    &    1 &  10   \\
+    Equilibration 2.2 &     1    &    1 &  20   \\
+    Equilibration 2.3 &     1    &    1 &  30   \\
+    Equilibration 2.4 &     1    &    1 &  40   \\
+    Equilibration 2.5 &     1    &    1 &  50   \\
+    Equilibration 3.1 &     2    &    1 & 100   \\
+    Equilibration 3.2 &     2    &    1 & 150   \\
+    Equilibration 3.3 &     2    &    1 & 200   \\
+    Equilibration 3.4 &     2    &    1 & 250   \\
+    Equilibration 3.5 &     2    &    1 & 300   \\
+    Equilibration 4.1 &    20    &    1 & 300   \\
+    Equilibration 4.2 &    20    &    2 & 300   \\
+    Equilibration 4.3 &    20    &    3 & 300   \\
+    Equilibration 4.4 &    20    &    4 & 300   \\
+    Equilibration 4.5 &    20    &    5 & 300   \\
+    Production        & 100{,}000 &    5 & 300   \\
+    \bottomrule
+  \end{tabular}
+    \caption{Molecular Dynamics Equilibration Procedure}
+  \label{tab:schedule}
+\end{table}
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Parameter}            & \textbf{Value}                    \\
+    \midrule
+    Simulation Engine             & OpenMM                            \\
+    Ion Type                      & NaCl                              \\
+    Ion Concentation              & 1 M                                \\
+    Box Shape                     & Dodecahedron                      \\
+    Box Padding                   & 0.5 nm                            \\
+    Force Field (Solute)           & RNA.Shaw\_charmm22-ions.xml       \\
+    Force Field (Solvent)          & implicit/gbn2.xml                 \\
+    Pressure                      & 1 atm                             \\
+    Sampling Frequency            & 1 ns                              \\
+    \bottomrule
+  \end{tabular}
+  \caption{Molecular Dynamics Simulation Parameters.}
+\label{tab:parameters}
+\end{table}
+
+
+
+
+
+
+\end{document}
