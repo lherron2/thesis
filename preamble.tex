@@ -8,6 +8,15 @@
 % Encoding and fonts
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\DeclareUnicodeCharacter{2013}{--}
+\DeclareUnicodeCharacter{2014}{---}
+\DeclareUnicodeCharacter{2018}{`}
+\DeclareUnicodeCharacter{2019}{'}
+\DeclareUnicodeCharacter{201C}{``}
+\DeclareUnicodeCharacter{201D}{''}
+\DeclareUnicodeCharacter{2026}{...}
+\DeclareUnicodeCharacter{2032}{'}
+\DeclareUnicodeCharacter{2500}{--}
 
 % Math
 \usepackage{amsmath,amssymb}
@@ -81,7 +90,7 @@ Professor [Committee Member Name]%
 % These were used during paper writing for author comments
 % Redefined to simply output the text without color
 
-\newcommand{\lh}[1]{#1}   % Lukas Herron
+\newcommand{\lh}[1]{{\color{blue}#1}}   % Lukas Herron
 \newcommand{\pt}[1]{#1}   % Pratyush Tiwary
 \newcommand{\rj}[1]{#1}   % Richard John
 \newcommand{\yh}[1]{#1}   % Yihang Wang
@@ -94,8 +103,13 @@ Professor [Committee Member Name]%
 %% UTILITY MACROS
 %% ========================================
 
-% Citation helper (if needed for compatibility)
-% \newcommand{\onlinecite}[1]{\hspace{-1 ex} \nocite{#1}\citenum{#1}}
+% Citation helper for imported paper text
+\newcommand{\onlinecite}[1]{\hspace{-1 ex} \nocite{#1}\citenum{#1}}
+
+% Support \nameref labels set explicitly in imported paper sections
+\makeatletter
+\newcommand\setcurrentname[1]{\def\@currentlabelname{#1}}
+\makeatother
 
 % Tilde rendering
 \newcommand{\mytexttilde}{\raisebox{0.5ex}{\texttildelow}}
