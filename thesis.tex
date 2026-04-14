@@ -4,11 +4,12 @@
 \input{preamble}
 
 % Thesis-specific settings
-\usepackage[margin=1in,footskip=0.25in]{geometry}
+\usepackage[margin=1in]{geometry}
 
 \begin{document}
 
 \doublespacing
+\pagestyle{empty}
 \hypersetup{pageanchor=false}
 \pagenumbering{gobble}
 \input{src/frontmatter/abstract}
@@ -18,18 +19,41 @@
 \input{src/frontmatter/copyright}
 \clearpage
 \hypersetup{pageanchor=true}
+\pagestyle{plain}
 \pagenumbering{roman}
 \setcounter{page}{2}
+\phantomsection
+\addcontentsline{toc}{chapter}{Acknowledgments}
 \input{src/frontmatter/acknowledgements}
 \clearpage
+
+\singlespacing
+\phantomsection
+\addcontentsline{toc}{chapter}{Table of Contents}
 \tableofcontents
 \clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Tables}
 \listoftables
 \clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Figures}
 \listoffigures
 \clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\input{src/frontmatter/abbreviations}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Publications}
+\input{src/frontmatter/publications}
+\clearpage
+
+\doublespacing
 \pagenumbering{arabic}
 \setcounter{page}{1}
+\modulolinenumbers[1]
+\linenumbers
 
 % Chapter 1: Introduction
 \chapter{Generative Modeling in the Biomolecular Sciences}
@@ -77,7 +101,10 @@
 % Bibliography
 \begingroup
 \singlespacing
-\bibliographystyle{unsrtnat}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{unsrt}
 \bibliography{bib/thesis}
 \endgroup
 

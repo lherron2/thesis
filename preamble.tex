@@ -8,6 +8,7 @@
 % Encoding and fonts
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{times}
 \DeclareUnicodeCharacter{2013}{--}
 \DeclareUnicodeCharacter{2014}{---}
 \DeclareUnicodeCharacter{2018}{`}
@@ -35,6 +36,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{makecell}
+\usepackage{supertabular}
 \usepackage{tabularx}
 
 % Figures
@@ -54,7 +56,7 @@
 \usepackage{url}
 
 % Bibliography
-\usepackage{natbib}
+\usepackage[sort,square,numbers]{natbib}
 
 % Appendix
 \usepackage{appendix}
@@ -62,8 +64,21 @@
 % Misc
 \usepackage{textcomp}
 \usepackage{comment}
+\usepackage{indentfirst}
+\usepackage[left]{lineno}
 \usepackage{microtype}
 \usepackage{setspace}
+\usepackage{titlesec}
+\usepackage[subfigure]{tocloft}
+
+\hypersetup{
+  colorlinks=true,
+  urlcolor=black,
+  linkcolor=blue,
+  citecolor=blue
+}
+
+\setlength{\parindent}{0.4in}
 
 %% ========================================
 %% THESIS METADATA
@@ -138,6 +153,38 @@ Professor [Committee Member Name]%
 \newcommand\eindent{\endgroup}
 
 \newcommand{\INDSTATE}[1][1]{\State\hspace{#1\algorithmicindent}}
+
+%% ========================================
+%% THESIS LAYOUT
+%% ========================================
+
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+\renewcommand{\bibname}{Bibliography}
+
+\titleformat{\chapter}{\normalfont\large}{Chapter \thechapter:}{1em}{}
+\titleformat{name=\chapter,numberless}{\normalfont\large\filcenter}{}{0pt}{}
+
+\renewcommand{\cfttoctitlefont}{\hfill\large}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\cftloftitlefont}{\hfill\large}
+\renewcommand{\cftafterloftitle}{\hfill}
+\renewcommand{\cftlottitlefont}{\hfill\large}
+\renewcommand{\cftafterlottitle}{\hfill}
+\renewcommand{\cftchapaftersnum}{:\ }
+\renewcommand{\cftchappresnum}{\chaptername\space}
+\setlength{\cftchapnumwidth}{6em}
+\setlength{\cftbeforechapskip}{1em}
+
+\makeatletter
+\g@addto@macro\appendix{%
+  \titleformat{\chapter}{\normalfont\large}{Appendix \thechapter:}{1em}{}%
+  \addtocontents{toc}{%
+    \protect\renewcommand{\protect\cftchappresnum}{\appendixname\space}%
+  }%
+}
+\makeatother
 
 %% ========================================
 %% MACRO CONFLICTS RESOLVED

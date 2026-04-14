@@ -1,22 +1,27 @@
 \thispagestyle{empty}
+{\singlespacing
+\hbox{\ }
+\vspace{0.7in}
+
 \begin{center}
-\vspace*{1.25in}
-ABSTRACT
+\large{ABSTRACT}
 
-\vspace{0.5in}
-\thesistitlecaps
-
-\vspace{0.35in}
-\thesisauthor
-
-\thesisdegree, \thesisyear
-
-\vspace{0.35in}
-Advisory Committee Chair: \thesisadvisor\\
-\thesisadvisordept
+\vspace{3em}
 \end{center}
 
-\vspace{0.5in}
+\noindent
+\begin{tabular}{@{}p{1.8in}p{4.6in}@{}}
+Title of Dissertation: & {\large \thesistitlecaps} \\
+& {\large \thesisauthor} \\
+& {\large \thesisdegree, \thesisyear} \\
+\ \\
+Dissertation Directed by: & {\large \thesisadvisor} \\
+& {\large \thesisadvisordept} \\
+\end{tabular}
+
+\vspace{3em}
+}
+
 Biomolecular structure is often represented as a single native conformation, but many molecular systems are more accurately described as thermodynamic ensembles of interconverting structures. This thesis develops a probabilistic generative modeling framework for learning such ensembles from limited molecular data. The central premise is that generative models are most effective for molecular science when their architecture reflects the physical structure of the target distribution rather than treating molecular configurations as unstructured data.
 
 The thesis begins by benchmarking representative probabilistic generative frameworks on molecular distributions with tunable dimensionality and multimodality. These comparisons identify denoising diffusion probabilistic models as especially capable for the moderate-dimensional, multimodal landscapes common in molecular systems. Building on that result, the next study shows that diffusion models trained on replica exchange molecular dynamics data can generate equilibrium samples at temperatures not present in the training set, indicating that transferable thermodynamic information can be learned directly from simulation data.
