@@ -1,3 +1,4 @@
+% !TEX root = ../thesis.tex
 % Chapter 6: Diffdock Glide
 % Source: papers/diffdock-glide/main.tex
 
@@ -32,14 +33,12 @@ DiffDock is a diffusion model that predicts binding poses for a small-molecule g
 
 DiffDock incorporates internal symmetries of molecular conformers as inductive biases. During conformer generation, perturbations to molecular degrees of freedom are represented as a product space $\mathbb{P}$ of groups: $\mathbb{T}(3) \times SO(3) \times SO(2)^m$; $\mathbb{T}(3)$ is the group of 3D-translations; $SO(3)$ is 3D-rotations; and $SO(2)^m$ are 2D-rotations of $m$ torsion angles. Clearly, the actions of $\mathbb{P}$ on a particular conformer will result in new conformers; it is then natural to ask if two arbitrary conformers are connected through an action of $\mathbb{P}$. Indeed, Corso et. al. show that a typical pair of conformers lie on a manifold $\mathcal{M}$ defined by actions of $\mathbb{P}$.~\cite{diffdock}
 
-DiffDock is a score-based diffusion model~\cite{score-based-generative}--that is, a stochastic differential equation--with dynamics on $\mathcal{M}$:
+DiffDock is a score-based diffusion model~\cite{Song2021ScoreBased}--that is, a stochastic differential equation--with dynamics on $\mathcal{M}$:
 \begin{equation}
-    \begin{aligned}
     \label{ch5:eq:diffdock-sde}
         \mathrm{d}\mathbf{x} = - \lambda(\tau) 
         \left[ \mathbf{x} - \sigma^{\mathbb{P}}\mathbf{s}^\mathbb{P}_\theta(\mathbf{x}, \mathbf{y}, \tau) \right]
-        \mathrm{d}\tau \\+ \sqrt{2 \lambda(\tau) \sigma^{\mathbb{P}}}\mathrm{d}\mathbf{B}^{\mathbb{P}}_\tau,
-    \end{aligned}
+        \mathrm{d}\tau + \sqrt{2 \lambda(\tau) \sigma^{\mathbb{P}}}\mathrm{d}\mathbf{B}^{\mathbb{P}}_\tau,
 \end{equation}
 where $\mathbf{B}_\tau^{\mathbb{P}}$ is Brownian motion on $\mathcal{M}$, $\lambda(\tau)$ is a time dilation factor to accelerate convergence of the diffusion process, and $\sigma^{\mathbb{P}}$ is the scale of the noise perturbations. The vectors $\mathbf{x}$ and $\mathbf{y}$--containing the positions of the heavy ligand and $C_\alpha$ protein atoms respectively--are inputs to a score network $\mathbf{s}_\theta$. The score network acts as a time-dependent vector field on $\mathcal{M}$ that generates binding poses from noise vectors by simulating Eq. \ref{ch5:eq:diffdock-sde} from $\tau = 0$ to $\tau = 1$.
 
@@ -51,14 +50,12 @@ The DockGen benchmark highlighted that DiffDock struggles to predict binding pos
 A flat-bottomed harmonic potential $\Phi$ characterizes the geometry and location of the binding site:
 \begin{equation}
     \label{ch5:eq:potential}
-    \begin{aligned}
-    &\Phi(\mathbf{r}, \mathbf{r}_0)  = \\
-    &\begin{cases} 
+    \Phi(\mathbf{r}, \mathbf{r}_0) =
+    \begin{cases}
     0 &\text{if } d \leq r_{\mathrm{min}} \\
     (d(\mathbf{r},\mathbf{r}_0) - r_{\mathrm{min}})^2 &\text{if } r_{\mathrm{min}} < d < r_{\mathrm{max}} \\
     d(\mathbf{r},\mathbf{r}_0)\cdot (r_{\mathrm{max}} - r_{\mathrm{min}}) &\text{if } d \geq r_{\mathrm{max}}.
     \end{cases}
-    \end{aligned}
 \end{equation}
 The function $d$ measures the distance between $\mathbf{r}$ and $\mathbf{r}_0$, $r_{\mathrm{min}}$ is the inner radius, and the outer radius $r_{\mathrm{max}}$ limits the gradient for numerical stability. The strength of the potential is controlled by $\gamma$. When $\gamma=0$ the generative process in Eq. \ref{ch5:eq:diffdock-sde}, is {\it unconditional}, i.e. the center of geometry $\mathbf{r}$ freely explores the entire protein surface; in contrast, when $\gamma > 0$, the generative process is {\it conditional} and the center of geometry is biased by $\Phi$ towards a spherical region of radius $r_\mathrm{min}$ centered around $\mathbf{r}_0$. The orthogonality of the groups factoring $\mathbb{P}$ guarantees that the rotational degrees of freedom of the generative process are unaffected by the translational bias.
 
@@ -107,7 +104,7 @@ In the remaining panels we stratify the results by maximum sequence similarity, 
 
 Traditional small-molecule drug design operates on targeting the primary orthosteric binding site of a receptor to modulate its activity. Orthosteric sites typically exhibit well-defined, highly conserved pockets that bind endogenous signaling molecules with high specificity and affinity. \cite{nussinov2012different} However, certain ``undruggable'' proteins lack well-defined binding pockets, posing a significant challenge for traditional drug discovery. Allosteric modulation offers a compelling alternative by targeting allosteric sites that are spatially separate from the orthosteric site, but can nonetheless affect the protein's function upon ligand binding.~\cite{Xie2023recent} Targeting allosteric sites in G-protein coupled receptors, for instance, has led to improved target selectivity and reduced off-target effects. \cite{nussinov2023alphafold}
 
-Although allosteric sites have therapeutic potential, current deep learning approaches remain focused on orthosteric targets. DiffDock's training set contains both ortho- and allosteric complexes, but is dominated by the former due to the historical bias towards orthosteric drug discovery and limitations of structure probing techniques like X-ray crystallography, which readily resolve well-defined orthosteric sites but struggle to capture the dynamic and flexible structures of allosteric sites.~\cite{vora2025fantastic} 
+Although allosteric sites have therapeutic potential, current deep learning approaches remain focused on orthosteric targets. DiffDock's training set contains both ortho- and allosteric complexes, but is dominated by the former due to the historical bias towards orthosteric drug discovery and limitations of structure probing techniques like X-ray crystallography, which readily resolve well-defined orthosteric sites but struggle to capture the dynamic and flexible structures of allosteric sites.~\cite{nussinov2023alphafold} 
 
 In this section, we demonstrate how biasing DiffDock's generative process enables targeting of allosteric sites. We design a cross-docking experiment centered around a $\beta$-2 Adrenergic G-coupled protein receptor domain containing both ortho- and allosteric sites. The reference complex (PDB: 6N48) is a \textit{holo} crystal structure of the $\beta$-2 Adrenergic receptor in complex with two ligands: BI-167107 is bound to the orthosteric site while Compound-6FA (KBY) occupies the allosteric site, which is shallow and lies exposed on the membrane interface of the receptor.~\cite{liu2019mechanism} The ligand of interest, KBY, engages in $\pi$–$\pi$ stacking interactions with side chain residue PHE1133 and interacts with hydrophobic residues on the membrane-exposed face of the receptor’s helical bundle. The target (PDB: 6KR8) is an NMR-derived model containing an ensemble of 10 conformers that represent the \textit{apo} state.~\cite{imai2020structural} We select the first conformer as a representative \textit{apo} structure, and  backbone alignment with the \textit{holo} conformer reveals an RMSD of less than 2{\AA}. It is worth noting that the \textit{holo} structure is present in the DiffDock training set whereas the \textit{apo} structure is not, though it is included in 2019 version of the PDB.
 
@@ -200,7 +197,7 @@ To demonstrate the improvement that pose minimization brings to DiffDock-Glide, 
 
 Still, there are instances where Glide Confgen successfully models essential interactions that DiffDock-Glide fails to capture. We focus on active compound CHEMBL251795, which is stabilized by a buried salt-bridge formed between the protonated amide and charged carboxylate on residue ASP1153, and a hydrogen bond between the ligand and ASN1140. Figure \ref{ch5:fig:igf1r}b depicts poses sampled by Glide Confgen (gray) with the bidentate salt-bridge and DiffDock-Glide (purple) without this key interaction. The top Glide Confgen pose is ranked as the top active with a score of $-9.5$. DiffDock-Glide does not sample the salt-bridge, and although minimization proceeds successfully, it yields a comparatively poor score of $-4.7$.
 
-\section{Outlook}
+\section{Discussion}
 In this work we have developed a hybrid approach to molecular docking called DiffDock-Glide that improves the out-of-distribution performance of data-driven docking. The core idea is to use a deep generative model to sample from a learned distribution of binding poses and subsequently relax the sampled poses with a physics and chemistry-based energy function that contains inductive biases. We conclusively demonstrate that providing such biases dramatically improves the performance of DiffDock. The primary limitations of DiffDock-Glide are sampling crystal-like poses, especially for out-of-distribution receptors, and selecting a crystal-like pose from the sampled distribution. 
 
 We found that the confidence and Glide scores are unable to reliably select for such poses even if they are present among the generate samples. Physics-based pose refinement beyond energy minimization may lead to more accurate pose ranking. We also found that DiffDock-Glide is especially suitable for virtual screening against AF2 receptor structures, though it should be noted that all the screened receptors except {\it PPARD} are found in DiffDock's training set. At the time of writing, there is no virtual screening equivalent of the Posebusters set, so the effects of overfitting could not be systematically investigated. Though based on the Posebusters analysis, we anticipate that DiffDock's performance will degrade for out-of-distribution targets, and the decline can be mitigated via the inclusion of appropriate biases. 

@@ -1,3 +1,4 @@
+% !TEX root = ../thesis.tex
 % Appendix B: Supplementary Material for Chapter 5
 % Source: extracted from src/ch6_rnaanneal.tex
 
@@ -159,7 +160,7 @@
     \ENDFOR
 
     \STATE $\displaystyle
-           \Delta \l_{pq}
+           \Delta \ell_{pq}
            \leftarrow
            \operatorname{trapz}\bigl(\mathcal{G},\,
                                     \{\beta_{k}\}_{k=1}^{K}\bigr)$
@@ -181,12 +182,12 @@
   \caption{RNAnneal Score}
   \label{ch6:alg:rnanneal-score}
   \begin{algorithmic}[1]
-    \REQUIRE  
+    \REQUIRE
     Log-likelihoods $\{L_{i}^{(\mathcal{F})}\}$;\\
     Feature sets $\mathcal{F}=\{\text{G-vector},\text{R-vector}\}\times\{\text{PCA},\text{SPIB}\}$;\\
     Component range $\mathcal{D}=2,3,\ldots,8$
 
-    \STATE $\displaystyle L_{\min}\leftarrow\min_{i}L_{i}$,\quad 
+    \STATE $\displaystyle L_{\min}\leftarrow\min_{i}L_{i}$,\quad
            $\displaystyle\sigma_{L}\leftarrow\sqrt{\operatorname{Var}\{L_{i}\}}$
     \FORALL{frames $i$}
       \STATE $\displaystyle l_{i}\;\leftarrow\;
@@ -196,7 +197,7 @@
       \STATE Sort $\{l_{i}\}$ in ascending order
       \STATE Initialize lists $\mathcal{S} = [\,]$ and $\mathcal{L} = [\,]$
     \FORALL{confrmers $i$}
-    
+
         \STATE $\mathcal{L}(i)\gets[\,]$
         \FORALL{feature-projection pairs $(v,f)\in\mathcal{F}$}
           \FORALL{dimensions $d\in\mathcal{D}$}
@@ -206,7 +207,7 @@
         \STATE Append {$\displaystyle\bar{s}_{i}
                = \frac{1}{|\mathcal{L}(i)|}\sum_{l\in\mathcal{L}(i)}l$} to ${\mathcal{S}}(i)$
                \COMMENT{{RNAnneal Score}}
-       
+
       \ENDFOR
       \RETURN ${\mathcal{S}}(i)$
   \end{algorithmic}
@@ -240,7 +241,7 @@
     \REQUIRE\ SPIB projections $\{\mathbf{x}_{i}\}$;\\
     State labels $\{y_{i}\}$;\\
     RNAnneal scores $\{s_{i}\}$;\\ Frame keys $\{f_{i}\}$;\\ Histogram grid size $(K=25,L=25)$;\\ Minimum population $N_{\min}=10$;\\ Pre‑filter count $k_{\mathrm{top}}=10$;\\ Report count $k_{\mathrm{rep}}=10$
-    \STATE $\mathcal{F}\!\leftarrow\!\{(y_{i},\mathbf{x}_{i},s_{i},f_{i})\}$ 
+    \STATE $\mathcal{F}\!\leftarrow\!\{(y_{i},\mathbf{x}_{i},s_{i},f_{i})\}$
     \STATE Group $\mathcal{F}$ by state label to obtain $\{\mathcal{F}_y\}$
     \STATE Discard states with $|\mathcal{F}_y|<N_{\min}$
     \STATE Compute the average score $\bar{s}_y $ for every surviving state
@@ -261,12 +262,185 @@
       \STATE $y\!\leftarrow\!y_{(r)}$
       \STATE $\mathcal{F}_y\!\leftarrow\!\{(s,f)\in\mathcal{F}_y\}$
       \STATE $f^\ast\!\leftarrow\!\arg\min_{(s,f)\in\mathcal{F}_y}\{s\}$ \COMMENT{representative frame}
-      
+
       \STATE Record $\bigl(r,y,p_y,f^\ast\bigr)$
     \ENDFOR
     \RETURN\ Table of the $k_{\mathrm{rep}}$ most‑probable states with their representatives
   \end{algorithmic}
 \end{algorithm}
+
+\section{Methods}
+
+\subsection{Secondary Structure Prediction}
+\phantomsection
+\setcurrentname{Secondary Structure Prediction}
+\label{ch6:methods:sec-struct}
+The secondary structure of an RNA is a simplified representation that specifies Watson-Crick base pairing. There are numerous, long-standing approaches available to predict secondary structures from the primary sequence.~\cite{sato2023recent} RNAnneal relies on three programs to predict RNA secondary structures: EternaFold~\cite{wayment2022rna}, LinearFold~\cite{huang2019linearfold}, and LinearAliFold~\cite{huang2019linearfold}. EternaFold is a probabilistic method for secondary structure prediction that
+has been benchmarked against several widely used secondary structure prediction algorithms (Algorithm \ref{ch6:alg:eternafold-sampling}). LinearFold is an algorithm for predicting secondary structures that has linear runtime with sequence length (Algorithm \ref{ch6:alg:linearfold-sampling}). LinearAliFold extends the functionality of LinearFold by implementing stochastic sampling (Algorithm \ref{ch6:alg:linearalifold-sampling}). After a large number of secondary structures have been predicted by the above methods, the structures are aggregated and redundant ones are filtered out.  Fig. S\ref{ch6:fig:sec-struct-eval} measures the fraction of correctly predicted bases for the predicted distributions of secondary structures for each riboswitch.
+
+\subsection{FARFAR2}
+\phantomsection
+\setcurrentname{FARFAR2}
+\label{ch6:methods:tertiary-struct}
+
+Rosetta's Fragment Assembly of RNA with Full-Atom Refinement (FARFAR) is a hybrid knowledge- and physics-based approach to sampling models of 3D RNA structure.~\cite{das2010atomic} FARFAR samples 3D models by performing Monte Carlo sampling on a low-resolution potential using a library of experimentally validated structure fragments, and then relaxes the structure in a higher-resolution all-atom potential. The quality of the conformations is evaluated by the Rosetta score. FARFAR2 further improves the performance of FARFAR with updates to the sampling algorithms, scoring weights, and fragment libraries.~\cite{watkins2020farfar2} The Rosetta score referred to in the main text and Fig. \ref{ch6:fig:results}g-h corresponds to the \texttt{rna\_hires.wts} file in Rosetta v2021.16.61629. Algorithm \ref{ch6:alg:rna_denovo} describes how RNAnneal uses FARFAR2 to sample a candidate model of the 3D structure with the primary sequence and a secondary structure as input.
+
+\subsection{Clustering}
+\phantomsection
+\setcurrentname{Clustering}
+\label{ch6:methods:representatives}
+
+A crucial step in RNAnneal is selecting representative conformations to simulate (see \nameref{ch6:methods:molecular-dynamics}) from the set of structures predicted by \nameref{ch6:methods:tertiary-struct}. To sample diverse conformations, we first compute G-vectors for the FARFAR2 conformations (see \nameref{ch6:methods:rna-features}), and then project the G-vectors onto $d=2,3,\ldots,26$ principal components. For each $d$ value, the data is clustered using the advanced density peaks algorithm~\cite{d2021automatic} implemented in \texttt{dadapy}~\cite{glielmo2022dadapy} with $Z=3$. Representatives are selected based on the the $d$ value that yields the maximum number of clusters (Fig. S\ref{ch6:fig:clusters_vs_d}). To select, e.g., 200 candidate structures, we first sort the conformations within each cluster based on their Rosetta score and then sort the clusters based on the top-scoring conformation in each cluster. The clusters are then traversed in order, and the top-scoring conformation is selected as a representative and subsequently removed from the cluster. If there are fewer than 200 candidate structures after all clusters have been traversed, then they are reordered based on the new top-scoring conformation and the selection procedure is repeated until 200 conformations are obtained. The entire procedure is detailed in Algorithm \ref{ch6:alg:candidate-selection}.
+
+\subsection{Molecular Dynamics}
+\phantomsection
+\setcurrentname{Molecular Dynamics}
+\label{ch6:methods:molecular-dynamics}
+
+RNAnneal simulates models of 3D RNA structure with implicit solvent MD in order to introduce variations in structure caused by the thermal environment. The simulations are conducted under the NVT ensemble using the OpenMM simulation engine and the DES-AMBER RNA force field.~\cite{eastman2023openmm,DE-Shaw-RNA-ff} The conformations are equilibrated by gradually increasing the temperature from $1$K to $300$K and then increasing the integration timestep from $1$fs to the production integration timestep of $5$fs (Table \ref{ch6:tab:schedule}). The production simulation is 100ns and frames are saved at 1ns intervals; additional simulation parameters like ion concentration and solvent model are provided in Table \ref{ch6:tab:parameters}. The DES-AMBER score is the potential energy of the MD simulations (i.e., the energy values of the force field and solvent model) standardized by first aggregating the energy across all simulations (for a given RNA) and then subtracting the minimum value and dividing the standard deviation.
+
+\subsection{R- and G-vectors}
+\phantomsection
+\setcurrentname{R- and G-vectors}
+\label{ch6:methods:rna-features}
+RNAnneal featurizes conformations with two nucleobase-centric representations constructed from R- and G-vectors.~\cite{gvecs-bussi} An R-vector is a displacement vector $\mathbf{r}_{ij}$ directed between the six-membered aromatic ring of nucleobases $i$ and $j$. The R-representation of a conformation with $N$ nucleobases is thus a tensor of shape $N \times N \times 3$. Similarly, the G-representation is a $N \times N \times 4$
+tensor consisting of G-vectors that capture the geometry of localized base-pairing and stacking interactions. The G-vector, $\mathbf{G}_{ij}$, is computed as
+\begin{gather}
+    \mathbf{G}_{ij}(\mathbf{r}_{ij}) =
+    \begin{pmatrix}
+    \sin (\gamma \lvert \mathbf{r}_{ij}\rvert)\frac{r_{ij,x}}{\lvert \mathbf{r}_{ij}\rvert} & \\
+    \sin (\gamma \lvert \mathbf{r}_{ij}\rvert)\frac{r_{ij,y}}{\lvert \mathbf{r}_{ij}\rvert} & \\
+    \sin (\gamma \lvert \mathbf{r}_{ij}\rvert)\frac{r_{ij,z}}{\lvert \mathbf{r}_{ij}\rvert} &  \\
+    1 + \cos (\gamma \lvert \mathbf{r}_{ij}\rvert)
+    \end{pmatrix}
+    \times \frac{\Theta (\lvert \mathbf{r}_{ij}\rvert - r_c)}{\gamma}
+\end{gather}
+where $\Theta$ is a step function, $r_c$ is a cutoff of $2.4${\AA}, and $\gamma=\pi/r_c$.
+
+\subsection{SPIB}
+\phantomsection
+\setcurrentname{SPIB}
+\label{ch6:methods:spib}
+
+The State Predictive Information Bottleneck (SPIB) framework allows one to embed a high-dimensional dynamical system into a lower-dimensional latent space while preserving the slowest degrees of freedom of the system.~\cite{wang2021state} SPIB takes the form of a time-lagged autoencoder, where high dimensional coordinates at time $t$ are passed to the encoder and embedded in a latent space; the decoder must then predict the state label at time $t+\Delta t$ solely from the latent embedding. SPIB has two main hyperparameters: the time lag, $\Delta t$ and a regularizer, $\beta$. The time lag corresponds to the lifetime of the predicted states, while $\beta$ regularizes the latent space to follow a mixture of Gaussians prior. We train two sets of SPIB models on the first 8 principal components of the \nameref{ch6:methods:rna-features}. For each feature type, we train seven models with the number of IB components, $d$, ranging from 2 to 8. For all models, we use a linear encoder, non-linear decoder, a $2$ns lag time, and set $\beta=0.05$. The SPIB implementation is provided by the \texttt{af2rave} python package.~\cite{teng2025alphafold2}
+
+% \lipsum[8]
+
+\subsection{Thermodynamic Maps}
+\phantomsection
+\setcurrentname{Thermodynamic Maps}
+\label{ch6:methods:thermodynamic-map}
+
+A thermodynamic map (TM) is a diffusion model variant that models the dependence of a structural ensemble on physical parameters like temperature, pressure, or chemical potential by representing their statistical effect on the prior distribution.~\cite{herron2024inferring,exptm,beyerle2025inferring} Temperature, for example, is represented by tempering the prior (i.e., adjusting the variance) on a per-sample basis, while pressure and chemical potential correspond to exponential tilting operations that shift the mean of the prior.~\cite{herron2024inferring,exptm} Once trained, the TM model can then be used to generate new samples or evaluate the likelihood of existing samples at a given set of thermodynamic conditions. In this work we modify the construction so that the prior is tempered based on the energy of the conformations. Concretely, for a given representation $\mathbf{x}_0$, we set the variance of the prior equal to the DES-AMBER score, $U_0$, of the conformation corresponding to $\mathbf{x}_0$ (see \nameref{ch6:methods:molecular-dynamics}; Fig. \ref{ch6:fig:schematic}c). The \nameref{ch6:sec:rnanneal} for a given conformation is computed from the log-likelihoods of the latent representations under the trained models. The log-likelihood calculation is summarized in Algorithm \ref{ch6:alg:diffusion-likelihood} and described in detail in Ref.~\cite{john2025comparison} Our TM implementation infers the energy-dependence of the conformational ensemble, and as a result one must choose a variance (i.e., a temperature) for the prior when computing the score. All the results in the main text employ a unit variance prior, but other values sometimes lead to better performance (Fig. S\ref{ch6:fig:model-temp-dependence}-S\ref{ch6:fig:acc-curve-summary}).
+
+% A thermodynamic map (TM) is a diffusion model variant that models the dependence of a structural ensemble on physical parameters like temperature, pressure, or chemical potential by representing these parameters in the prior distribution.~\cite{herron2024inferring,exptm,beyerle2025inferring} The TM model can then be used to generate new samples or evaluate the likelihood of existing samples at a given temperature. In Ref. \cite{herron2024inferring}, for example, structures observed at a low temperature are mapped onto a prior with a small variance (i.e., a low temperature) while high-temperature samples are mapped onto a prior with large variance. In this work we modify the construction so that the TM encodes both the free- and potential-energy landscape of an RNA molecule: conformations that are low-lying on the energy landscape are mapped onto a low-variance prior, while those high on the energy landscape are mapped onto a high-variance prior. More concretely, for a given representation $\mathbf{x}_0$, we set the variance of the prior equal to the DES-AMBER score, $U_0$, of the conformation corresponding to $\mathbf{x}_0$ (see \nameref{ch6:methods:molecular-dynamics}; Fig. \ref{ch6:fig:schematic}c). The \nameref{ch6:sec:rnanneal} for a given conformation is computed from the log-likelihoods of the latent representations under the trained models. The log-likelihood calculation is summarized in Algorithm \ref{ch6:alg:diffusion-likelihood} and described in detail in Ref.~\cite{john2025comparison} Evaluating the log-likelihood requires choosing a variance for the prior; all of the results reported in the main text are generated at $T=1$, but we found the RNAnneal score to be robust with respect to choice of $T$ (Fig. S\ref{ch6:fig:model-temp-dependence}-S\ref{ch6:fig:acc-curve-summary}).
+
+\subsection{RNAnneal Score}
+\phantomsection
+\setcurrentname{RNAnneal Score}
+\label{ch6:sec:rnanneal}
+
+RNAnneal scores conformations using an ensemble of \nameref{ch6:methods:thermodynamic-map} trained on geometric and energetic features extracted from a set of 3D conformations (Fig. \ref{ch6:fig:schematic}b-d). A total of 28 TMs are trained for each RNA, covering all four combinations of representations (\nameref{ch6:methods:rna-features}) and projections (PCA and \nameref{ch6:methods:spib}). For each feature-projection combination, the number of projection components $d$ varies from 2 to 8 inclusive. After training, the RNAnneal score is computed from the log-likelihoods of the training data under the TM ensemble (Algorithm \ref{ch6:alg:diffusion-likelihood} and \ref{ch6:alg:rnanneal-score}).
+
+\subsection{Reference Structures}
+\phantomsection
+\setcurrentname{Reference Structures}
+\label{ch6:methods:preparation}
+
+RNAnneal's structure prediction performance was evaluated on a set of riboswitch sequences with structures that have been solved by high-resolution experimental methods (Table \ref{ch6:tab:riboswitches} and Fig. S\ref{ch6:fig:all-representatives}). The reference ERCs were prepared by downloading the associated Protein Data Bank (PDB) entry, removing any non-nucleic residues, filling in missing nucleobases using \nameref{ch6:methods:tertiary-struct}, and subsequently minimizing the conformation with the Rosetta energy function (see Algorithm \ref{ch6:alg:farfar-minimise}).
+
+\subsection{RMSD}
+\phantomsection
+\setcurrentname{RMSD}
+\label{ch6:methods:rmsd}
+
+Root Mean Squared Deviation (RMSD) is a metric commonly used to evaluate discrepancies between structure models. We evaluate the heavy-atom RMSD of each model after alignment to the native structure. The RMSD between a model $\mathbf{x}$ and reference $\mathbf{y}$ conformation containing $N$ heavy atoms is defined as
+\begin{equation}
+    \mathrm{RMSD}(\mathbf{x}, \mathbf{y}) = \sqrt{\frac{1}{N}\sum_{i=1}^N d(\mathbf{x}_i, \mathbf{y}_i)^2},
+\end{equation}
+where $d(\mathbf{x}_i, \mathbf{y}_i)$ measures the distance between the $i$-th atom in both models. The RMSD values for RNAnneal conformations and molecular dynamics simulations of the reference structure are reported in Fig. S\ref{ch6:fig:rmsd_decoys} and Fig. S\ref{ch6:fig:rmsd_reference}.
+
+\subsection{INF}
+\phantomsection       \setcurrentname{INF}
+\label{ch6:methods:inf}
+
+Interaction Network Fidelity (INF) quantifies the similarity between two conformations based on their Leontis-Westhof base pairing and stacking classifications.~\cite{parisien2009new,leontis2001geometric} Let $S_m$ and $S_r$ denote the sets of nucleobase interactions (base pairs and base stacks) in the model and reference conformations, respectively. The INF is defined as the Fowlkes-Mallows Index between these interaction sets:
+\begin{equation}
+\mathrm{INF} = \sqrt{\frac{|\mathrm{TP}|}{|\mathrm{TP}|+|\mathrm{FP}|}\times \frac{|\mathrm{TP}|}{|\mathrm{TP}|+|\mathrm{FN}|}}
+\end{equation}
+where $\mathrm{TP} = S_m \cap S_r$ are interactions present in both structures, $\mathrm{FP} = S_m \ S_r$ are interactions present only in the model, and $\mathrm{FN} = S_r \ S_m$ are interactions present only in the reference. Minor, localized structural differences (e.g., at a helix junction) may yield large RMSD values due to poor global alignment. Because the INF compares interaction networks directly without requiring alignment, it is more robust to such variations and to thermal fluctuations. We compute the INF using the ClaRNA~\cite{walen2014clarna} implementation in \texttt{rna-tools}~\cite{magnus2020rna}. INF values are reported in Fig. S\ref{ch6:fig:inf-detailed} and S\ref{ch6:fig:inf_reference}-\ref{ch6:fig:inf_decoys}.
+
+\subsection{AUAC}
+\phantomsection       \setcurrentname{AUAC}
+\label{ch6:methods:auac}
+The Area Under the Accumulation Curve (AUAC) is a metric suited for evaluating classification task performance (Fig. \ref{ch6:fig:schematic}e and \ref{ch6:fig:results}g).~\cite{truchon2007bedroc} Let $x\in [0,1]$ be the normalized rank and $f:r \rightarrow \{0,1\}$ be an associated set of labels, with $1$ indicating the positive (near-ERC) class and $0$ indicating the decoy class. The empirical CDF is then
+\begin{equation}
+    A(r) = \int_0^r f(s)ds
+\end{equation}
+and the area under the accumulation curve is
+\begin{equation}
+    \label{ch6:eq:auac}
+    \mathrm{AUAC} = \int_0^1 A(r)dr.
+\end{equation}
+When the $\mathrm{AUAC}$ is $1$, the classification is perfect, i.e., members of the positive class are always ranked above decoys. The accumulation curves for the 15 riboswitches investigated in the main text are provided in Fig. S\ref{ch6:fig:acc-curves} and S\ref{ch6:fig:acc-curve-summary}.
+
+\subsection{BEDROC}
+\phantomsection       \setcurrentname{BEDROC}
+\label{ch6:methods:bedroc}
+
+The Boltzmann-Enhanced Discrimination of Receiver Operator Characteristic (BEDROC) modifies the Area Under the Accumulation Curve (\nameref{ch6:methods:auac}) to focus on early recognition of the positive (near-ERC) class (Fig. \ref{ch6:fig:schematic}e and \ref{ch6:fig:results}g).~\cite{truchon2007bedroc} The AUAC is skewed towards late recognition since contributions from the lowest ranked samples dominate the area calculation in Eq. \ref{ch6:eq:auac}. One may introduce an exponentially decreasing weight on the rank in the AUAC calculation to focus on early recognition, i.e.,
+\begin{equation}
+    \label{ch6:eq:wauac}
+    w\mathrm{AUAC} = \int_0^1 A(r)e^{-\alpha r}dr,
+\end{equation}
+which is normalized to obtain
+\begin{equation}
+    \label{ch6:eq:bedroc}
+    \mathrm{BEDROC} = \frac{w\mathrm{AUAC} - w\mathrm{AUAC}_{\mathrm{min}}}{w\mathrm{AUAC}_{\mathrm{max}} - w\mathrm{AUAC}_{\mathrm{min}}}.
+\end{equation}
+The tunable parameter $\alpha$ controls the focus on early recognition. Our choice of $\alpha=8$ is such that the top $20\%$ of the normalized rank contributes $80\%$ of the $w\mathrm{AUAC}$. Early recognition is a suitable evaluation metric when there is a large class imbalance and accurate classification among the highest ranks is essential.
+
+\subsection{Interaction Entropy}
+\phantomsection       \setcurrentname{Interaction Entropy}
+\label{ch6:methods:interaction-entropy}
+Interaction entropy measures how heterogeneous each nucleobase’s interaction patterns are across an ensemble of conformations. First, each nucleobase $i$ is assigned a Leontis--Westhof (LW) base-base contact classification for every structure in the ensemble.~\cite{leontis2001geometric} The distribution of these classifications defines probabilities $p_i(c_j)$ for each contact $c$ with partner nucleotide $j$. The interaction entropy is then the Shannon entropy of this distribution,
+\[
+H_i = -\sum_j \sum_{c \in \mathcal{C}} p_i(c_j) \,\log_2 p_i(c_j),
+\]
+where $\mathcal{C}$ denotes the set of LW classes. Expressing the Shannon entropy in bits lends a direct interpretation: a nucleotide with interaction entropy $H$ participates in $2^{H}$ distinct base-base interactions across the ensemble (Fig. \ref{ch6:fig:ensemble-results}b). The probabilities may be computed as unweighted frequencies or with prior weights associated to each structure. In this work we use state probabilities (see \nameref{ch6:methods:state-ranking}) computed from the RNAnneal score as prior weights.
+
+\subsection{State Ranking}
+\phantomsection       \setcurrentname{State Ranking}
+\label{ch6:methods:state-ranking}
+
+We briefly describe the procedure by which a conformational ensemble, i.e., a small number of representative conformations and their weights, is predicted by RNAnneal. We project the RNAnneal conformations onto the $d=2$ information‑bottleneck (IB) space learned by \nameref{ch6:methods:spib} to obtain latent representations $\{\mathbf{x}_0,\mathbf{x}_1,\ldots,\mathbf{x}_N\}$. We further assign the predicted state label, $y_i \in \{y_0,y_1,\ldots,y_M \}$ and \nameref{ch6:sec:rnanneal}, $s_i$, to each conformation. Next, we histogram the conformations on a $K \times L$ grid in the IB space (Fig. \ref{ch6:fig:results}j), using the mean $s$ in each bin (denoted by $\overline{{s}}_{kl}$) to define a Boltzmann‑like weight
+$w_{kl} = \exp[{-\overline{{s}}_{kl}}]$. We assign each populated bin a state label, $y_{kl}$, based on the most frequent state label of the conformations in the bin, and define a total weight, $W_i$, for state $y_i$ by $W_i = \sum_{y_{kl}=y_i} w_{kl}$. Finally, normalizing the state weights yields state probabilities $p_{yi}$, and the frame with the minimal $s_i$ within each state is taken as its representative conformation. The entire procedure is described in Algorithm \ref{ch6:alg:state-ranking}. The states predicted in the main text (Fig. \ref{ch6:fig:ensemble-results}) and supplement (Fig. S\ref{ch6:fig:rep-ensemble-1}-S\ref{ch6:fig:rep-ensemble-4}) were predicted based on a $d=2$ SPIB model trained on the first 2 PCA components of the G-vectors.
+
+% \subsection{Structure of a Thermodynamic Map}
+
+% The structure of the map is best understood through superstatistics -- an extension of Gibbs-Boltzmann statistics where fluctuations of intensive variables are permitted. In examining $p(\mathbf{x}_1)$ as the marginal of $p(\mathbf{x}_1, \mathbf{x}_0)$ one finds
+% \begin{align}
+%     p(\mathbf{x}_1) =& \int p(\mathbf{x}_1, \mathbf{x}_0) d \mathbf{x}_0 \\
+%     =& \int p(\mathbf{x}_1| \mathbf{x}_0) r(\mathbf{x}_0) d \mathbf{x}_0 \\
+%     p(\mathbf{x}_1) = & \int \frac{\exp \left[{-U_1(\mathbf{x}_1)/U_0(\mathbf{x}_0)}\right]}{Z(\mathbf{x}_0)} r(\mathbf{x}_0) d\mathbf{x}_0
+% \end{align}
+% which amounts to Beck and Cohen's superstatistic
+% \begin{align}
+%     p(\mathbf{x}_1) =& \int_0^\infty \exp \left[ {-\beta U_1(\mathbf{x}_1)} \right] f(\beta) d\beta
+% \end{align}
+% after the change of variables
+% \begin{equation}
+%     f(\beta) = \int \frac{r(\mathbf{x}_0)}{Z(\mathbf{x}_0)} \delta\left( \beta - \frac{1}{U_0(\mathbf{x}_0)}\right) d \mathbf{x}_0.
+% \end{equation}
+% The prior is a superposition of the Gibbs-Boltzmann statistic $\exp \left[-\beta U_1(\mathbf{x}_1) \right]$ and inverse-temperatures $f(\beta)$. In superstatistics $f(\beta)$ is often modeled analytically as a gamma or log-normal distribution, but in our case the distribution is determined by the data $\mathbf{x}_0 \in \mathcal{D}$. Since our score model is trained jointly on $f(\beta)$ and $r(\mathbf{x}_0)$, one may sample $p_\theta(\mathbf{x}_0, \beta_0)$ by first sampling $\mathbf{x}_1 \propto \exp \left[ {-\beta U_1(\mathbf{x})} \right]$ and $\beta_1 \propto \exp \left(-\beta^2/2 \right)$ and then simulating the dynamics in Eq. \ref{eq:sde-bck}.
+
+% \lipsum[8]
+
+% \subsection{Boltzmann-Enhanced Discrimination of Receiver Operator Characteristic (BEDROC)}
+
+% \lipsum[8]
+
+%
 
 \begin{figure*}
     \centering
@@ -457,22 +631,49 @@
     \label{ch6:fig:rep-ensemble-4}%
 \end{figure*}
 
-\begin{table}[ht]
-  \centering
-  \begin{tabular}{@{} l c c c c c c @{}}
+\clearpage
+\begingroup
+\singlespacing
+\setlength{\tabcolsep}{1pt}
+\renewcommand{\arraystretch}{1}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\setlength{\LTcapwidth}{\textwidth}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.92in}
+                    >{\raggedright\arraybackslash}p{0.85in}
+                    >{\centering\arraybackslash}p{0.58in}
+                    >{\centering\arraybackslash}p{0.42in}
+                    >{\centering\arraybackslash}p{0.48in}
+                    >{\raggedright\fontsize{9}{9.75}\selectfont\arraybackslash}p{1.50in}
+                    >{\raggedright\fontsize{9}{9.75}\selectfont\arraybackslash}p{1.50in}@{}}
+  \caption{Details of riboswitch sequences and reference conformations}
+  \label{ch6:tab:riboswitches}\\
     \toprule
-    \textbf{RNA} 
-      & \textbf{PDB} 
-      & \makecell[l]{\textbf{Monomer}}
+    \textbf{RNA}
+      & \textbf{PDB}
+      & \makecell[c]{\textbf{Mono}\\\textbf{mer}}
       % & \textbf{Apo/Holo}
       & \makecell[l]{\textbf{State}}
-      & \textbf{Length} 
-      & \textbf{Sequence} 
-      & \textbf{Secondary Structure} \\
+      & \makecell[c]{\textbf{Len}\\\textbf{gth}}
+      & {\normalsize\textbf{Sequence}}
+      & {\normalsize\textbf{Secondary Structure}} \\
     \midrule
-    
-    \addlinespace[0.5em]
-
+    \endfirsthead
+    \toprule
+    \textbf{RNA}
+      & \textbf{PDB}
+      & \makecell[c]{\textbf{Mono}\\\textbf{mer}}
+      & \makecell[l]{\textbf{State}}
+      & \makecell[c]{\textbf{Len}\\\textbf{gth}}
+      & {\normalsize\textbf{Sequence}}
+      & {\normalsize\textbf{Secondary Structure}} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    \addlinespace[0.25em]
     % first row
     \makecell[l]{Neomycin \\ sensing \\ riboswitch}
     & 2MXS~\cite{Schmidtke2015}
@@ -480,14 +681,14 @@
     & Holo
     & 28
     & \makecell[l]{%
-          \texttt{ggcugcuuguccuuuaaugguccaguc}
+          \texttt{ggcugcuuguccuuuaaug} \\
+          \texttt{guccaguc}
         }
     & \makecell[l]{
-      \texttt{(.(((...(.((......)).)))).)}
+      \texttt{(.(((...(.((......)} \\
+      \texttt{).)))).)}
       } \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     % second row
     \makecell[l]{c‑di‑GMP‑II \\ riboswitch}
     & 3Q3Z~\cite{Smith2010}
@@ -495,301 +696,310 @@
     & Holo
     & 76
     & \makecell[l]{%
-          \texttt{gcgcggaaacaaugaugaauggguuuaaau}  \\
-          \texttt{ugggcacuugacucauuuugaguuaguagu} \\
-          \texttt{gcaaccgaccgugcu}
+          \texttt{gcgcggaaacaaugaugaa} \\
+          \texttt{uggguuuaaauugggcacu} \\
+          \texttt{ugacucauuuugaguuagu} \\
+          \texttt{agugcaaccgaccgugcu}
           }
     & \makecell[l]{
-      \texttt{((.(((..((.......((((.((......}\\
-      \texttt{[\{\{[[[[[..)).))))....))....]]]}\\
-      \texttt{]]].\}\}..))).)).}
+      \texttt{((.(((..((.......((} \\
+      \texttt{((.((......[\{\{[[[[[} \\
+      \texttt{..)).))))....))....} \\
+      \texttt{]]]]]].\}\}..))).)).}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{TPP \\ riboswitch}
     & 4NYA~\cite{Warner2014}
     & Y
     & Holo
     & 81
     & \makecell[l]{%
-          \texttt{ggacucggggugcccuucugcgugaaggcu} \\
-          \texttt{gagaaauacccguaucaccugaucuggaua} \\ 
-          \texttt{augccagcguagggaaguuc} \\
+          \texttt{ggacucggggugcccuucu} \\
+          \texttt{gcgugaaggcugagaaaua} \\
+          \texttt{cccguaucaccugaucugg} \\
+          \texttt{auaaugccagcguagggaa} \\
+          \texttt{guuc}
         }
-      
     & \makecell[l]{
-    \texttt{(.(((((((.((((.(((.....)))))).}\\
-    \texttt{.....)..)))).....(((...((((...}\\
-    \texttt{...))))...)))..))).)}
+    \texttt{(.(((((((.((((.(((.} \\
+    \texttt{....))))))......)..} \\
+    \texttt{)))).....(((...((((} \\
+    \texttt{......))))...)))..)} \\
+    \texttt{)).)}
       }
       \\
-
-        \addlinespace[0.5em]
-
+        \addlinespace[0.25em]
     \makecell[l]{NiCo \\ transition\\-metal \\ riboswitch}
     & 4RUM~\cite{Warner2014}
     & Y
     & Holo
     & 93
     & \makecell[l]{%
-          \texttt{gggaacugagcaggcaaugaccagagcggu} \\
-          \texttt{caugcagccgggcugcgaaagcggcaacag} \\
-          \texttt{augauacacgcacaucugugggacaguucc} \\
-          \texttt{ca}
+          \texttt{gggaacugagcaggcaaug} \\
+          \texttt{accagagcggucaugcagc} \\
+          \texttt{cgggcugcgaaagcggcaa} \\
+          \texttt{cagaugauacacgcacauc} \\
+          \texttt{ugugggacaguuccca}
         }
-
     & \makecell[l]{
-    \texttt{((((((((..(.(((.((((((.....)))} \\
-    \texttt{)))...)))..((.((....)).)).((((} \\
-    \texttt{(((.........)))))))..).)))))))} \\
-    \texttt{).}
+    \texttt{((((((((..(.(((.(((} \\
+    \texttt{(((.....))))))...))} \\
+    \texttt{)..((.((....)).)).(} \\
+    \texttt{((((((.........))))} \\
+    \texttt{)))..).)))))))).}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
         \makecell[l]{3',3'-cGAMP \\ sensing \\ riboswitch}
     & 4YAZ~\cite{ren2015structural}
     & Y
     & Holo
     & 84
     & \makecell[l]{%
-          \texttt{gguacacgacaauacuaaaccauccgcgag} \\
-          \texttt{gauggggcggaaagccuaagggucucccug} \\
-          \texttt{agacagccgggcugccgaaauauc}
+          \texttt{gguacacgacaauacuaaa} \\
+          \texttt{ccauccgcgaggauggggc} \\
+          \texttt{ggaaagccuaagggucucc} \\
+          \texttt{cugagacagccgggcugcc} \\
+          \texttt{gaaauauc}
         }
-
     & \makecell[l]{
-    \texttt{(.((..((......(....((((((....)} \\
-    \texttt{)))))..[.)...(((...(((((((...)} \\
-    \texttt{)))).])).)))...))...)).)} \\
+    \texttt{(.((..((......(....} \\
+    \texttt{((((((....))))))..[} \\
+    \texttt{.)...(((...(((((((.} \\
+    \texttt{..))))).])).)))...)} \\
+    \texttt{)...)).)}
     }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{SAM-III \\ riboswitch}
     & 6C27~\cite{Grigg2018}
     & Y
     & Apo
     & 48
     & \makecell[l]{%
-          \texttt{gggacaaguucccgaaaggauggcggaaac} \\
-          \texttt{gccagaugccuuguccc} \\
+          \texttt{gggacaaguucccgaaagg} \\
+          \texttt{auggcggaaacgccagaug} \\
+          \texttt{ccuuguccc}
         }
-
     & \makecell[l]{
-    \texttt{.(((((((.(.(.....).)(.((......} \\
-    \texttt{)).).....))))))).} \\
+    \texttt{.(((((((.(.(.....).} \\
+    \texttt{)(.((......)).)....} \\
+    \texttt{.))))))).}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{YkoY\\riboswitch}
     & 6CB3~\cite{Bachas2018}
     & N
     & Holo
     & 100
       & \makecell[l]{%
-          \texttt{aaaggggaguagcgucgggaaaccgaaaca} \\
-          \texttt{aagucgucaauucgugaggaaacucaccgg} \\
-          \texttt{cuuuguugacauacgaaaguauguuuagca} \\
-          \texttt{agaccuuuc} \\
+          \texttt{aaaggggaguagcgucggg} \\
+          \texttt{aaaccgaaacaaagucguc} \\
+          \texttt{aauucgugaggaaacucac} \\
+          \texttt{cggcuuuguugacauacga} \\
+          \texttt{aaguauguuuagcaagacc} \\
+          \texttt{uuuc}
         }
       & \makecell[l]{
-    \texttt{.((((......((.((((....))))((((} \\
-    \texttt{(((.((.......(((((....))))))).} \\
-    \texttt{))))))).((((((....))))))...)).} \\
-    \texttt{...))))..} \\
+    \texttt{.((((......((.((((.} \\
+    \texttt{...))))(((((((.((..} \\
+    \texttt{.....(((((....)))))} \\
+    \texttt{)).))))))).((((((..} \\
+    \texttt{..))))))...))....))} \\
+    \texttt{))..}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{PRPP \\ riboswitch}
     & 6DLQ~\cite{Peselis2018}
     & Y
     & Holo
     & 108
     & \makecell[l]{%
-          \texttt{ggaaagugugucuaggguuccgcgugcuuc} \\
-          \texttt{ggcacggacugguccaagugacacagacgc} \\
-          \texttt{auucgugcguuacaccggagggauagaagc} \\
-          \texttt{ccaggcggguagguuuc} \\
+          \texttt{ggaaagugugucuaggguu} \\
+          \texttt{ccgcgugcuucggcacgga} \\
+          \texttt{cugguccaagugacacaga} \\
+          \texttt{cgcauucgugcguuacacc} \\
+          \texttt{ggagggauagaagcccagg} \\
+          \texttt{cggguagguuuc}
         }
     & \makecell[l]{
-    \texttt{..((...(((((..((...((.(((((...} \\
-    \texttt{.)))))....)).))....)))))..((((} \\
-    \texttt{(....)))))..(.[[[..(((.......)} \\
-    \texttt{)).).]]]......)).} \\
+    \texttt{..((...(((((..((...} \\
+    \texttt{((.(((((....)))))..} \\
+    \texttt{..)).))....)))))..(} \\
+    \texttt{((((....)))))..(.[[} \\
+    \texttt{[..(((.......))).).} \\
+    \texttt{]]]......)).}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{PreQ1 \\ riboswitch}
     & 6E1W~\cite{Numata2019}
     & Y
     & Holo
     & 31
     & \makecell[l]{%
-          \texttt{cugggucgcaguuuccccaguuaacaaaac}
+          \texttt{cugggucgcaguuucccca} \\
+          \texttt{guuaacaaaac}
         }
     & \makecell[l]{
-    \texttt{(((((.....[....))))).........]}
+    \texttt{(((((.....[....))))} \\
+    \texttt{).........]}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{Mn$^{2+}$-\\sensing \\ riboswitch}
     & 6N2V~\cite{Price2018}
     & Y
     & Holo
     & 99
     & \makecell[l]{%
-          \texttt{gcuuggggaguagccugcuuucggaaacga} \\
-          \texttt{aagcgccuguaucaacauacucggcgaaag} \\
-          \texttt{ccguggugcaggaccgaaaggucuggcgag} \\
-          \texttt{accaggcc}
+          \texttt{gcuuggggaguagccugcu} \\
+          \texttt{uucggaaacgaaagcgccu} \\
+          \texttt{guaucaacauacucggcga} \\
+          \texttt{aagccguggugcaggaccg} \\
+          \texttt{aaaggucuggcgagaccag} \\
+          \texttt{gcc}
         }
-
     & \makecell[l]{
-    \texttt{.(.(((......(((..(.((((....)))} \\
-    \texttt{).)..((((.(.((.......((((....)} \\
-    \texttt{))))).).))))(((....)))..)))...} \\
-    \texttt{.))).)..} \\
+    \texttt{.(.(((......(((..(.} \\
+    \texttt{((((....)))).)..(((} \\
+    \texttt{(.(.((.......((((..} \\
+    \texttt{..)))))).).))))(((.} \\
+    \texttt{...)))..)))....))).} \\
+    \texttt{)..}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{Tetrahydro-\\folate \\ riboswitch}
     & 6Q57~\cite{Dunstan2018}
     & Y
     & Holo
     & 90
     & \makecell[l]{%
-          \texttt{ggagaguagaugauucgcguuaagugugug} \\
-          \texttt{ugaaugggaugucgucacacaacgaagcga} \\
-          \texttt{gagcgcggugaaucauugcauccgcucca} \\
+          \texttt{ggagaguagaugauucgcg} \\
+          \texttt{uuaagugugugugaauggg} \\
+          \texttt{augucgucacacaacgaag} \\
+          \texttt{cgagagcgcggugaaucau} \\
+          \texttt{ugcauccgcucca}
         }
-      
     & \makecell[l]{
-    \texttt{.(((......((((((.((.......((((} \\
-    \texttt{(((...[[[[[...)))))))....((...} \\
-    \texttt{.)).))..))))))...]]]]].)))..} \\
+    \texttt{.(((......((((((.((} \\
+    \texttt{.......(((((((...[[} \\
+    \texttt{[[[...)))))))....((} \\
+    \texttt{....)).))..))))))..} \\
+    \texttt{.]]]]].)))..}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{Glutamine \\ II riboswitch}
     & 6QN3~\cite{Huang2019}
     & N
     & Holo
     & 51
     & \makecell[l]{%
-          \texttt{cguucacccuucggggcgcaugaaauggga} \\
-          \texttt{guagggaacgggauucucau}
+          \texttt{cguucacccuucggggcgc} \\
+          \texttt{augaaaugggaguagggaa} \\
+          \texttt{cgggauucucau}
         }
     & \makecell[l]{
-    \texttt{......(((....)))........(.(.((} \\
-    \texttt{.(..........).)).).)} \\
+    \texttt{......(((....)))...} \\
+    \texttt{.....(.(.((.(......} \\
+    \texttt{....).)).).)}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{NAD$^{+}$ \\ riboswitch}
     & 6TFF~\cite{Huang2020}
     & Y
     & Holo
     & 53
     & \makecell[l]{%
-          \texttt{ggcuucaacaaccccguagguugggccgaa} \\
-          \texttt{aggcagcgaaucuacuggagcc}
+          \texttt{ggcuucaacaaccccguag} \\
+          \texttt{guugggccgaaaggcagcg} \\
+          \texttt{aaucuacuggagcc}
         }
     & \makecell[l]{
-    \texttt{((((.((.....[[.((((.(((.(((...} \\
-    \texttt{.))).]]))).)))))).))))} \\
+    \texttt{((((.((.....[[.((((} \\
+    \texttt{.(((.(((....))).]])} \\
+    \texttt{)).)))))).))))}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{Guanine\\ riboswitch}
     & 6UBU~\cite{Matyjasik2019}
     & Y
     & Holo
     & 68
     & \makecell[l]{%
-          \texttt{ggacauauaaucgcguggauauggcacgca} \\
-          \texttt{aguuucuaccgggcaccguaaauguccgac} \\
-          \texttt{uaugucc}
+          \texttt{ggacauauaaucgcgugga} \\
+          \texttt{uauggcacgcaaguuucua} \\
+          \texttt{ccgggcaccguaaaugucc} \\
+          \texttt{gacuaugucc}
         }
-
     & \makecell[l]{
-    \texttt{((((((((..(.(((((.....[[))))).} \\
-    \texttt{)[.....)](((.((]].....)).)))..} \\
-    \texttt{)))))))} \\
+    \texttt{((((((((..(.(((((..} \\
+    \texttt{...[[))))).)[.....)} \\
+    \texttt{](((.((]].....)).))} \\
+    \texttt{)..)))))))}
       }
       \\
-
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{FMN \\ riboswitch}
     & 6WJR~\cite{Wilt2020}
     & Y
     & Apo
     & 112
     & \makecell[l]{%
-          \texttt{ggaucuucggggcagggugaaauucccgac} \\
-          \texttt{cggugguauaguccacgaaaguauuugcuu} \\
-          \texttt{ugauuuggugaaauuccaaaaccgacagua} \\
-          \texttt{gagucuggaugagagaagauu}
+          \texttt{ggaucuucggggcagggug} \\
+          \texttt{aaauucccgaccgguggua} \\
+          \texttt{uaguccacgaaaguauuug} \\
+          \texttt{cuuugauuuggugaaauuc} \\
+          \texttt{caaaaccgacaguagaguc} \\
+          \texttt{uggaugagagaagauu}
         }
     & \makecell[l]{
-    \texttt{..((((((.......((.......))..((} \\
-    \texttt{((((((....[[))))..(((......)))} \\
-    \texttt{...(((((.......)))))]])).[[[..} \\
-    \texttt{..))]]].......)))))).} \\
+    \texttt{..((((((.......((..} \\
+    \texttt{.....))..((((((((..} \\
+    \texttt{..[[))))..(((......} \\
+    \texttt{)))...(((((.......)} \\
+    \texttt{))))]])).[[[....))]} \\
+    \texttt{]].......)))))).}
       }
       \\
-    
-    \addlinespace[0.5em]
-
+    \addlinespace[0.25em]
     \makecell[l]{Cobalamin \\ riboswitch}
     & 6VMY~\cite{Chan2020}
     & Y
     & Holo
     & 149
     & \makecell[l]{%
-          \texttt{ggucaaauaggugccgguccgugaacaaca} \\
-          \texttt{gccggcuuaaaagggaaaccgguaaaagcc} \\
-          \texttt{ggugcggucccgccacuguaauuggccaag} \\
-          \texttt{cgccaagagccaggauaccugccuguuuga} \\
-          \texttt{ucagcacgaauucugcgaggacagauga}
+          \texttt{ggucaaauaggugccgguc} \\
+          \texttt{cgugaacaacagccggcuu} \\
+          \texttt{aaaagggaaaccgguaaaa} \\
+          \texttt{gccggugcggucccgccac} \\
+          \texttt{uguaauuggccaagcgcca} \\
+          \texttt{agagccaggauaccugccu} \\
+          \texttt{guuugaucagcacgaauuc} \\
+          \texttt{ugcgaggacagauga}
         }
     & \makecell[l]{
-    \texttt{(.((.((.(((.(((((..[((.....)).} \\
-    \texttt{.))))).....(((....((((......))} \\
-    \texttt{)).((((.....)).[[[....((((....} \\
-    \texttt{.))))...))]]]]...))).))).)).))} \\
-    \texttt{.)..(.....((........).)...).} \\
+    \texttt{(.((.((.(((.(((((..} \\
+    \texttt{[((.....))..)))))..} \\
+    \texttt{...(((....((((.....} \\
+    \texttt{.)))).((((.....)).[} \\
+    \texttt{[[....((((.....))))} \\
+    \texttt{...))]]]]...))).)))} \\
+    \texttt{.)).)).)..(.....((.} \\
+    \texttt{.......).)...).}
       }
       \\
+\end{longtable}
+\endgroup
 
-    \bottomrule
-  \end{tabular}
-  \caption{Details of riboswitch sequences and reference conformations}
-  \label{ch6:tab:riboswitches}
-\end{table}
-
-\begin{table}[]
+\begin{table}[H]
   \centering
   \begin{tabular}{lccc}
     \toprule
@@ -818,7 +1028,7 @@
   \label{ch6:tab:schedule}
 \end{table}
 
-\begin{table}[]
+\begin{table}[H]
   \centering
   \begin{tabular}{ll}
     \toprule
