@@ -164,8 +164,8 @@ Dr. John Schneekloth\\
 \renewcommand{\listtablename}{List of Tables}
 \renewcommand{\bibname}{Bibliography}
 
-\titleformat{\chapter}{\normalfont\large}{Chapter \thechapter:}{1em}{}
-\titleformat{name=\chapter,numberless}{\normalfont\large\filcenter}{}{0pt}{}
+\titleformat{\chapter}{\normalfont\large}{Chapter \thechapter:}{1em}{\bfseries}
+\titleformat{name=\chapter,numberless}{\normalfont\large\filcenter}{}{0pt}{\bfseries}
 
 \renewcommand{\cfttoctitlefont}{\hfill\large}
 \renewcommand{\cftaftertoctitle}{\hfill}
@@ -180,7 +180,7 @@ Dr. John Schneekloth\\
 
 \makeatletter
 \g@addto@macro\appendix{%
-  \titleformat{\chapter}{\normalfont\large}{Appendix \thechapter:}{1em}{}%
+  \titleformat{\chapter}{\normalfont\large}{Appendix \thechapter:}{1em}{\bfseries}%
   \addtocontents{toc}{%
     \protect\renewcommand{\protect\cftchappresnum}{\appendixname\space}%
   }%

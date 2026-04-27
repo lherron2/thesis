@@ -1,0 +1,21 @@
+% !TEX root = ../thesis.tex
+% Appendix: Supplementary Material for Chapter 3
+
+\section{MD simulations setup}
+\label{ch3:app:setup}
+\label{ch3:sec:setup}
+
+\subsection{\texorpdfstring{AIB$_9$}{AIB9}}
+The simulation of AIB$_9$ was setup by following a previous study~\cite{SPIB_AIB9}. The PDB file was taken from the authors with permission, and the simulations are done with the CHARMM36m all atom force field \cite{huang2017charmm36m} using TIP3P water molecules~\cite{tip3p}, a Parrinello-Rahman barostat~\cite{Parrinello_Rahman_dynamics}, and a Nose-Hoover thermostat~\cite{hoover, nose--hoover} under the NPT ensemble. Simulations were performed using GROMACS 2016.~\cite{2016gromacs} The structures of AIB$_9$ were saved every 0.2 ps and the dihedral angles were calculated using PLUMED 2.4~\cite{plumed}.
+
+\subsection{GACC}
+The simulations of GACC were done with the AMBER ff12 all atom force field, using TIP3P water molecules~\cite{tip3p}, a Parrinello-Rahman barostat~\cite{Parrinello_Rahman_dynamics}, and a Bussi-Parrinello velocity rescaling thermostat~\cite{Bussi_Parrinello_thermostat} under the NPT ensemble. The simulations were performed using GROMACS 2016~\cite{2016gromacs}. The AMBER force filed was chosen because it exhibits more conformational variability compared with CHARMM force filed in a previous study~\cite{Bergonzo2015}. The structures of GACC were also saved every 0.2 ps and the relevant dihedral angles were calculated using PLUMED 2.4~\cite{plumed}.
+
+The PDB file of the GACC structure that served as the starting point for our simulation was generated using PyMOL. The initial structure was assumed to be at a temperature of 10K, and the systems energy was minimized with positional restraints of 25 kcal mol$^{-1}$ \AA$^{-2}$ in a two step process - first the steepest descent algorithm was applied for 1000 steps followed by the conjugate gradient algorithm for another 1000 steps. Next, the system was equilibrated to 150K over 100ps under the NVT ensemble with positional restraints of 25 kcal mol$^{-1}$ \AA$^{-2}$. Then, the GACC was equilibrated from 150K to 277K at 1 atm under the NPT ensemble for 100 ps with positional restraints of 5 kcal mol$^{-1}$ \AA$^{-2}$. Finally, a long 5 ns equilibration was performed over 5ns at 298K under the NPT ensemble with positional restraints of 0.5 kcal mol$^{-1}$ \AA$^{-2}$, after which the system was copied to 48 replicas, and each replica was equilibrated to its target temperature under the NPT ensemble with positional restraints of 0.5 kcal mol$^{-1}$ \AA$^{-2}$.
+
+The replica temperatures were geometrically spaced temperatures ranging from 277K to 408K, with temperature increased by 1$\%$ for each replica. The attempt of exchanging configurations was made every 10 ps, which is determined by checking the time correlation function of the potential energy.
+
+\section{Network structure and hyperparameters}
+\label{ch3:app:network}
+
+The structure of the network is shown in Fig. \ref{ch3:fig:U-net}. It has a U-net structure~\cite{unet}, where the input is down-sampled by 4 residue blocks and then up-sampled by another 4 residue blocks. The diffusion process is divided into 1000 discrete steps. The network parameters are optimized by the Adam algorithm \cite{Adam} with a learning rate equal to $2\time 10^{-5}$. Exponential moving average (EMA) with a decrease rate 0.995 is used to stabilize the stochastic gradient descent.

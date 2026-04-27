@@ -1,305 +1,36 @@
 % !TEX root = ../thesis.tex
-% Appendix B: Supplementary Material for Chapter 5
+% Appendix C: Supplementary Material for Chapter 5
 % Source: extracted from src/ch6_rnaanneal.tex
 
-\begin{algorithm}[H]
-  \caption{Sampling RNA secondary structures with \texttt{EternaFold}}
-  \label{ch6:alg:eternafold-sampling}
-  \begin{algorithmic}[1]
-    \REQUIRE \texttt{example.fa} (input sequence);\\
-    \texttt{N} (maximum number of samples, \texttt{5000})
-    \STATE \texttt{mkdir -p eternafold}
-    \STATE \texttt{EternaFold/src/contrafold sample example.fa} \\
-    \ \texttt{--params EternaFold/parameters/EternaFoldParams.v1} \\
-    \ \texttt{--nsamples N > eternafold/ef.ss}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Sampling RNA secondary structures with \texttt{LinearFold}}
-  \label{ch6:alg:linearfold-sampling}
-  \begin{algorithmic}[1]
-    \REQUIRE \texttt{example.fa} (input sequence)
-    \STATE \texttt{mkdir -p linearfold-v}
-    \COMMENT {Vienna parameters}
-    \STATE \texttt{mkdir -p linearfold-c}
-    \COMMENT {CONTRAfold parameters}
-    \STATE \texttt{cat example.fa | linearfold --zuker --delta 1000 -V | tail -n +5 | awk '\{print \$1\}' > linearfold-v/zuker.ss} \\
-    \STATE \texttt{cat example.fa | linearfold --zuker --delta 1000       | tail -n +5 | awk '\{print \$1\}' > linearfold-c/zuker.ss}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Sampling RNA secondary structures with \texttt{LinearAliFold}}
-  \label{ch6:alg:linearalifold-sampling}
-  \begin{algorithmic}[1]
-    \REQUIRE \texttt{example.fa} (input sequence);\\
-    \texttt{N} (maximum number of samples, \texttt{20000})
-    \STATE \texttt{mkdir -p linearalifold-v}
-    \COMMENT {Vienna parameters}
-    \STATE \texttt{mkdir -p linearalifold-bl}
-    \COMMENT {BL* parameters}
-
-    \STATE \texttt{cat example.fa | linearalifold.py -s N -e 1 > linearalifold-v/stochastic.ss}
-    \STATE \texttt{cat example.fa | linearalifold.py -s N -e 2 > linearalifold-bl/stochastic.ss}
-    \STATE \texttt{cat example.fa | linearalifold.py -p -B linearalifold-v/bpp.txt -M linearalifold-v/mea.ss -T linearalifold-v/threshknot.ss -C linearalifold-v/centroid.ss -e 1}
-    \STATE \texttt{cat example.fa | linearalifold.py -p -B linearalifold-bl/bpp.txt -M linearalifold-bl/mea.ss -T linearalifold-bl/threshknot.ss -C linearalifold-bl/centroid.ss -e 2}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Conformational sampling with FARFAR2}
-  \label{ch6:alg:rna_denovo}
-  \begin{algorithmic}[1]
-  \REQUIRE \texttt{SEQ} (input sequence);\\
-  \texttt{DB} (secondary structure in dot-bracket notation)
-    \STATE \texttt{rna\_denovo.default.linuxgccrelease} \\
-    \ \texttt{-sequence SEQ} \COMMENT {From \texttt{example.fa} in Algorithms \ref{ch6:alg:eternafold-sampling}-\ref{ch6:alg:linearalifold-sampling}} \\
-    \ \texttt{-secstruct DB} \COMMENT {\texttt{cat */*.ss | uniq} from Algorithms \ref{ch6:alg:eternafold-sampling}-\ref{ch6:alg:linearalifold-sampling}}\\
-    \ \texttt{-nstruct 1} \\
-    \ \texttt{-cycles 20000} \\
-    \ \texttt{-minimize\_rna true} \\
-    \ \texttt{-rna:denovo:rounds 10} \\
-    \ \texttt{-rna:denovo:minimize:minimize\_bps true} \\
-    \ \texttt{-rna:denovo:bps\_moves true}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Reference conformation preparation with FARFAR2}
-  \label{ch6:alg:farfar-minimise}
-  \begin{algorithmic}[1]
-    \REQUIRE \texttt{SEQ} (input sequence);\\
-    \texttt{REF} (reference PDB file)
-    \STATE \texttt{rna\_denovo.default.linuxgccrelease} \\
-    \ \texttt{-sequence \$(echo \$SEQ)} \COMMENT{lower‑case sequence} \\[-0.2em]
-    \ \texttt{-secstruct '.....'} \COMMENT{all bases unpaired; equal to length of \texttt{\$SEQ}} \\[-0.2em]
-    \ \texttt{-nstruct 1} \\[-0.2em]
-    \ \texttt{-out:file:silent \$(dirname \$REF)/silent.out} \\[-0.2em]
-    \ \texttt{-s \$REF} \COMMENT{experimental model} \\[-0.2em]
-    \ \texttt{-minimize\_rna true} \\[-0.2em]
-    \ \texttt{-rna:denovo:rounds 1} \\[-0.2em]
-    \ \texttt{-out:overwrite true} \\[-0.2em]
-    \ \texttt{-cycles 10000} \\[-0.2em]
-    \ \texttt{-rna:denovo:minimize:minimize\_bps true}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Unsupervised selection of diverse candidate conformations}
-  \label{ch6:alg:candidate-selection}
-  \begin{algorithmic}[1]
-    \REQUIRE FARFAR2 models $\{\mathbf{x}_i\}_{i=1}^{N}$; \\
-    Density‐peaks parameter $Z{=}3$;\\
-    Principal component range $d\!=\!2,3\ldots\,26$;\\
-    Target count $K{=}200$
-    \STATE Featurize each model $\mathbf{x}_i$ into a G-vector
-    \FOR{$d \in \{2,3,\dots,26\}$}
-      \STATE Project all G-vectors onto the first $d$ principal components
-      \STATE Cluster the projection with \texttt{dadapy} (advanced density peaks, $Z{=}3$)
-      \STATE Record the number of clusters obtained
-    \ENDFOR
-    \STATE Let $d^\ast$ be the dimension giving the maximum cluster count \COMMENT{see Fig.\,S\ref{ch6:fig:clusters_vs_d}}
-    \STATE Re-cluster the $d^\ast$-dimensional data to obtain $\{\mathcal{C}_j\}_{j=1}^{M}$
-    \FORALL{clusters $\mathcal{C}_j$}
-      \STATE Sort conformations in $\mathcal{C}_j$ by ascending Rosetta score
-    \ENDFOR
-    \STATE Sort the clusters by the best Rosetta score among all conformations in each cluster
-    \STATE $\mathcal{S} \leftarrow \varnothing$ \COMMENT{set of selected candidates}
-    \WHILE{$|\mathcal{S}| < K$}
-      \FOR{$j = 1$ \TO $M$}
-        \IF{$\mathcal{C}_j \neq \varnothing$}
-          \STATE Remove the top-scoring conformation $c$ from $\mathcal{C}_j$ and add $c$ to $\mathcal{S}$
-          \IF{$|\mathcal{S}| = K$}
-            \STATE \textbf{break}
-          \ENDIF
-        \ENDIF
-      \ENDFOR
-      \STATE Re-sort clusters by their current top-scoring conformation
-    \ENDWHILE
-    \RETURN $\mathcal{S}$ \COMMENT{200 candidate conformations}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Likelihood estimation for a thermodynamic map (diffusion model) using the Hutchinson trace estimator}
-  \label{ch6:alg:diffusion-likelihood}
-  \begin{algorithmic}[1]
-    \REQUIRE Observed frame $\mathbf{u}_{0}\equiv (\mathbf{x}_0, U_0)^\top$ (data at $t_0\equiv t={0}$); \\
-    Diffusion process $\mathcal{D}$ with time grid $\{t_{0}\!\!<\!\!t_{1}\!\!<\!\!\dots\!\!<\!\!t_{K}\}$; \\
-    One–step map $\mathrm{STEP}_{t_{k}\!\rightarrow t_{k+1}} \colon \mathbf{u}\!\mapsto\!\mathbf{u}'$; \COMMENT{Neural network} \\
-    Prior temperature $T$; \COMMENT{$T=1$ unless otherwise stated} \\
-    Temperature-dependent prior density $q_T(\mathbf{u}_{t_K})\equiv \mathcal{N}(0,T) \times \mathcal{N}(0,1)$; \COMMENT{Different priors for $\mathbf{x}$ and $U$} \\
-    Schedule of noise scales $\{\beta_{k}\}_{k=1}^{K}$; \\
-    Number of Hutchinson probe vectors $M$
-    \STATE $\mathbf{u}\leftarrow\mathbf{u}_{0}$  \COMMENT{state at the current time $t_{k}$}
-    \STATE $\mathcal{G}\leftarrow[\,]$          \COMMENT{to store divergence $g_{k}$}
-    \FOR{$k\;=\;0\;\mathbf{to}\;K-1$}
-      \STATE Draw $M$ probe vectors
-             $\bigl\{\mathbf{v}^{(m)}\bigr\}_{m=1}^{M}
-                    \sim\mathcal{N}\bigl(\mathbf{0},\mathbf{I}\bigr)$
-      \FORALL{probes $m=1,\dots,M$}
-        \STATE $(\mathbf{u}'^{(m)},\mathbf{Jv}^{(m)})\;
-               \leftarrow\;
-               \mathrm{JVP}\Bigl(
-                 \mathrm{STEP}_{t_{k}\!\rightarrow t_{k+1}},
-                 \mathbf{u},\,
-                 \mathbf{v}^{(m)}
-               \Bigr)$ \COMMENT{Jacobian‐vector product}
-      \ENDFOR
-      \STATE $\displaystyle
-             g_{k}\;\leftarrow\;
-             \frac{1}{M}
-             \sum_{m=1}^{M}
-               \bigl\langle
-                 \mathbf{Jv}^{(m)},\,\mathbf{v}^{(m)}
-               \bigr\rangle$
-             \COMMENT{Hutchinson trace estimate of $\nabla_{\!\mathbf{u}}\!\cdot\!\mathrm{STEP}$}
-      \STATE Append $g_{k}$ to $\mathcal{G}$
-      \STATE $\mathbf{u}\leftarrow\mathbf{u}'^{(1)}$ \COMMENT{all probes have the same output}
-    \ENDFOR
-
-    \STATE $\displaystyle
-           \Delta \ell_{pq}
-           \leftarrow
-           \operatorname{trapz}\bigl(\mathcal{G},\,
-                                    \{\beta_{k}\}_{k=1}^{K}\bigr)$
-           \COMMENT{trapezoidal integration on $(g_{k},\beta_{k})$}
-    \STATE $\displaystyle
-           \log q
-           \leftarrow
-           \log q_T\bigl(\mathbf{u}\bigr)$
-           \COMMENT{prior log‐density at $t_{K}$ at temperature $T$}
-    \STATE $\displaystyle
-           \log p_{\theta}\bigl(\mathbf{u}_{0}\bigr)
-           \leftarrow
-           \log q + \Delta_{pq}$
-    \RETURN $\log p_{\theta}(\mathbf{u}_{0})$
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{RNAnneal Score}
-  \label{ch6:alg:rnanneal-score}
-  \begin{algorithmic}[1]
-    \REQUIRE
-    Log-likelihoods $\{L_{i}^{(\mathcal{F})}\}$;\\
-    Feature sets $\mathcal{F}=\{\text{G-vector},\text{R-vector}\}\times\{\text{PCA},\text{SPIB}\}$;\\
-    Component range $\mathcal{D}=2,3,\ldots,8$
-
-    \STATE $\displaystyle L_{\min}\leftarrow\min_{i}L_{i}$,\quad
-           $\displaystyle\sigma_{L}\leftarrow\sqrt{\operatorname{Var}\{L_{i}\}}$
-    \FORALL{frames $i$}
-      \STATE $\displaystyle l_{i}\;\leftarrow\;
-              {\bigl(L_{i}-L_{\min}\bigr)}\;
-              {/\;\sigma_{L}}$ \COMMENT{subtract min and divide by SD}
-    \ENDFOR
-      \STATE Sort $\{l_{i}\}$ in ascending order
-      \STATE Initialize lists $\mathcal{S} = [\,]$ and $\mathcal{L} = [\,]$
-    \FORALL{confrmers $i$}
-
-        \STATE $\mathcal{L}(i)\gets[\,]$
-        \FORALL{feature-projection pairs $(v,f)\in\mathcal{F}$}
-          \FORALL{dimensions $d\in\mathcal{D}$}
-              \STATE Append $l_{i}^{(v,f,d)}$ to $\mathcal{L}(i)$
-            \ENDFOR
-          \ENDFOR
-        \STATE Append {$\displaystyle\bar{s}_{i}
-               = \frac{1}{|\mathcal{L}(i)|}\sum_{l\in\mathcal{L}(i)}l$} to ${\mathcal{S}}(i)$
-               \COMMENT{{RNAnneal Score}}
-
-      \ENDFOR
-      \RETURN ${\mathcal{S}}(i)$
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Interaction Entropy calculation}
-  \label{ch6:alg:interaction-entropy}
-  \begin{algorithmic}[1]
-    \REQUIRE Ensemble of conformations $\{X_{1},\dots,X_{M}\}$;\\
-             Nucleotides $i=1,\dots,N$; \\
-             Prior weights $\{w_{1},\dots,w_{M}\}$ with $\sum_{j} w_{j}=1$; \\
-             LW classification function $\mathrm{LW}(i,X_{j}) \rightarrow c \in \mathcal{C}$.
-    \FORALL{nucleotides $i=1,\dots,N$}
-      \STATE Initialize frequency table $f_{i}(c) \gets 0$ for all $c \in \mathcal{C}$
-      \FORALL{conformations $j=1,\dots,M$}
-        \STATE $c \gets \mathrm{LW}(i,X_{j})$
-        \STATE $f_{i}(c) \gets f_{i}(c) + w_{j}$
-      \ENDFOR
-      \STATE $p_{i}(c) \gets f_{i}(c) / \sum_{c' \in \mathcal{C}} f_{i}(c')$ \COMMENT{Normalize}
-      \STATE $H_{i} \gets -\sum_{c \in \mathcal{C}} p_{i}(c) \log_2 p_{i}(c)$
-    \ENDFOR
-    \RETURN $\{H_{i}\}_{i=1}^{N}$ \COMMENT{interaction entropies for all nucleotides}
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{Boltzmann‑weighted state ranking and representative selection}
-  \label{ch6:alg:state-ranking}
-  \begin{algorithmic}[1]
-    \REQUIRE\ SPIB projections $\{\mathbf{x}_{i}\}$;\\
-    State labels $\{y_{i}\}$;\\
-    RNAnneal scores $\{s_{i}\}$;\\ Frame keys $\{f_{i}\}$;\\ Histogram grid size $(K=25,L=25)$;\\ Minimum population $N_{\min}=10$;\\ Pre‑filter count $k_{\mathrm{top}}=10$;\\ Report count $k_{\mathrm{rep}}=10$
-    \STATE $\mathcal{F}\!\leftarrow\!\{(y_{i},\mathbf{x}_{i},s_{i},f_{i})\}$
-    \STATE Group $\mathcal{F}$ by state label to obtain $\{\mathcal{F}_y\}$
-    \STATE Discard states with $|\mathcal{F}_y|<N_{\min}$
-    \STATE Compute the average score $\bar{s}_y $ for every surviving state
-    \STATE Keep the $k_{\mathrm{top}}$ states with the lowest $\bar{s}_y$
-    \STATE Initialise histogram $H$ on an $K\times L$ grid over 2D IB space
-    \FORALL{frames $(y,\mathbf{x},s,f)\in\bigcup\mathcal{F}_y$}
-      \STATE Increment $H$ at the bin containing $\mathbf{x}$ with $(s,y)$
-    \ENDFOR
-    \FORALL{occupied bins $(k,l)$}
-      \STATE $\bar{s}_{kl}\!\leftarrow\!\text{mean score in bin }(k,l)$
-      \STATE $w_{kl}\!\leftarrow\!\exp(-\bar{s}_{kl})$ \COMMENT{Boltzmann weight in bin $h_{kl}$}
-      \STATE $y^\ast\!\leftarrow\!\arg\max_y\{\text{count of }y\text{ in }(k,l)\}$ \COMMENT{State assigned to bin $h_{kl}$}
-      \STATE $W_{y^\ast}\!\leftarrow\!W_{y^\ast}+w_{kl}$ \COMMENT{Each bin $h_{kl}$ with state $y^\ast$ contributes $w_{kl}$ to the total state weight $W_{y^\ast}$}
-    \ENDFOR
-    \STATE $p_y\!\leftarrow\!W_y\,/\,\sum_{y'}W_{y'}$ \COMMENT{Normalize weights}
-    \STATE Order states by $p_y$ (descending) to obtain $(y_{(1)},\dots,y_{(k_{\mathrm{rep}})})$
-    \FOR{$r=1$ \TO $k_{\mathrm{rep}}$}
-      \STATE $y\!\leftarrow\!y_{(r)}$
-      \STATE $\mathcal{F}_y\!\leftarrow\!\{(s,f)\in\mathcal{F}_y\}$
-      \STATE $f^\ast\!\leftarrow\!\arg\min_{(s,f)\in\mathcal{F}_y}\{s\}$ \COMMENT{representative frame}
-
-      \STATE Record $\bigl(r,y,p_y,f^\ast\bigr)$
-    \ENDFOR
-    \RETURN\ Table of the $k_{\mathrm{rep}}$ most‑probable states with their representatives
-  \end{algorithmic}
-\end{algorithm}
-
-\section{Methods}
-
-\subsection{Secondary Structure Prediction}
+{\color{red}\section{Secondary Structure Prediction}}
 \phantomsection
 \setcurrentname{Secondary Structure Prediction}
 \label{ch6:methods:sec-struct}
 The secondary structure of an RNA is a simplified representation that specifies Watson-Crick base pairing. There are numerous, long-standing approaches available to predict secondary structures from the primary sequence.~\cite{sato2023recent} RNAnneal relies on three programs to predict RNA secondary structures: EternaFold~\cite{wayment2022rna}, LinearFold~\cite{huang2019linearfold}, and LinearAliFold~\cite{huang2019linearfold}. EternaFold is a probabilistic method for secondary structure prediction that
 has been benchmarked against several widely used secondary structure prediction algorithms (Algorithm \ref{ch6:alg:eternafold-sampling}). LinearFold is an algorithm for predicting secondary structures that has linear runtime with sequence length (Algorithm \ref{ch6:alg:linearfold-sampling}). LinearAliFold extends the functionality of LinearFold by implementing stochastic sampling (Algorithm \ref{ch6:alg:linearalifold-sampling}). After a large number of secondary structures have been predicted by the above methods, the structures are aggregated and redundant ones are filtered out.  Fig. S\ref{ch6:fig:sec-struct-eval} measures the fraction of correctly predicted bases for the predicted distributions of secondary structures for each riboswitch.
 
-\subsection{FARFAR2}
+{\color{red}\section{FARFAR2}}
 \phantomsection
 \setcurrentname{FARFAR2}
 \label{ch6:methods:tertiary-struct}
 
 Rosetta's Fragment Assembly of RNA with Full-Atom Refinement (FARFAR) is a hybrid knowledge- and physics-based approach to sampling models of 3D RNA structure.~\cite{das2010atomic} FARFAR samples 3D models by performing Monte Carlo sampling on a low-resolution potential using a library of experimentally validated structure fragments, and then relaxes the structure in a higher-resolution all-atom potential. The quality of the conformations is evaluated by the Rosetta score. FARFAR2 further improves the performance of FARFAR with updates to the sampling algorithms, scoring weights, and fragment libraries.~\cite{watkins2020farfar2} The Rosetta score referred to in the main text and Fig. \ref{ch6:fig:results}g-h corresponds to the \texttt{rna\_hires.wts} file in Rosetta v2021.16.61629. Algorithm \ref{ch6:alg:rna_denovo} describes how RNAnneal uses FARFAR2 to sample a candidate model of the 3D structure with the primary sequence and a secondary structure as input.
 
-\subsection{Clustering}
+{\color{red}\section{Clustering}}
 \phantomsection
 \setcurrentname{Clustering}
 \label{ch6:methods:representatives}
 
 A crucial step in RNAnneal is selecting representative conformations to simulate (see \nameref{ch6:methods:molecular-dynamics}) from the set of structures predicted by \nameref{ch6:methods:tertiary-struct}. To sample diverse conformations, we first compute G-vectors for the FARFAR2 conformations (see \nameref{ch6:methods:rna-features}), and then project the G-vectors onto $d=2,3,\ldots,26$ principal components. For each $d$ value, the data is clustered using the advanced density peaks algorithm~\cite{d2021automatic} implemented in \texttt{dadapy}~\cite{glielmo2022dadapy} with $Z=3$. Representatives are selected based on the the $d$ value that yields the maximum number of clusters (Fig. S\ref{ch6:fig:clusters_vs_d}). To select, e.g., 200 candidate structures, we first sort the conformations within each cluster based on their Rosetta score and then sort the clusters based on the top-scoring conformation in each cluster. The clusters are then traversed in order, and the top-scoring conformation is selected as a representative and subsequently removed from the cluster. If there are fewer than 200 candidate structures after all clusters have been traversed, then they are reordered based on the new top-scoring conformation and the selection procedure is repeated until 200 conformations are obtained. The entire procedure is detailed in Algorithm \ref{ch6:alg:candidate-selection}.
 
-\subsection{Molecular Dynamics}
+{\color{red}\section{Molecular Dynamics}}
 \phantomsection
 \setcurrentname{Molecular Dynamics}
 \label{ch6:methods:molecular-dynamics}
 
 RNAnneal simulates models of 3D RNA structure with implicit solvent MD in order to introduce variations in structure caused by the thermal environment. The simulations are conducted under the NVT ensemble using the OpenMM simulation engine and the DES-AMBER RNA force field.~\cite{eastman2023openmm,DE-Shaw-RNA-ff} The conformations are equilibrated by gradually increasing the temperature from $1$K to $300$K and then increasing the integration timestep from $1$fs to the production integration timestep of $5$fs (Table \ref{ch6:tab:schedule}). The production simulation is 100ns and frames are saved at 1ns intervals; additional simulation parameters like ion concentration and solvent model are provided in Table \ref{ch6:tab:parameters}. The DES-AMBER score is the potential energy of the MD simulations (i.e., the energy values of the force field and solvent model) standardized by first aggregating the energy across all simulations (for a given RNA) and then subtracting the minimum value and dividing the standard deviation.
 
-\subsection{R- and G-vectors}
+{\color{red}\section{R- and G-vectors}}
 \phantomsection
 \setcurrentname{R- and G-vectors}
 \label{ch6:methods:rna-features}
@@ -317,7 +48,7 @@ tensor consisting of G-vectors that capture the geometry of localized base-pairi
 \end{gather}
 where $\Theta$ is a step function, $r_c$ is a cutoff of $2.4${\AA}, and $\gamma=\pi/r_c$.
 
-\subsection{SPIB}
+{\color{red}\section{SPIB}}
 \phantomsection
 \setcurrentname{SPIB}
 \label{ch6:methods:spib}
@@ -326,7 +57,7 @@ The State Predictive Information Bottleneck (SPIB) framework allows one to embed
 
 % \lipsum[8]
 
-\subsection{Thermodynamic Maps}
+{\color{red}\section{Thermodynamic Maps}}
 \phantomsection
 \setcurrentname{Thermodynamic Maps}
 \label{ch6:methods:thermodynamic-map}
@@ -335,21 +66,21 @@ A thermodynamic map (TM) is a diffusion model variant that models the dependence
 
 % A thermodynamic map (TM) is a diffusion model variant that models the dependence of a structural ensemble on physical parameters like temperature, pressure, or chemical potential by representing these parameters in the prior distribution.~\cite{herron2024inferring,exptm,beyerle2025inferring} The TM model can then be used to generate new samples or evaluate the likelihood of existing samples at a given temperature. In Ref. \cite{herron2024inferring}, for example, structures observed at a low temperature are mapped onto a prior with a small variance (i.e., a low temperature) while high-temperature samples are mapped onto a prior with large variance. In this work we modify the construction so that the TM encodes both the free- and potential-energy landscape of an RNA molecule: conformations that are low-lying on the energy landscape are mapped onto a low-variance prior, while those high on the energy landscape are mapped onto a high-variance prior. More concretely, for a given representation $\mathbf{x}_0$, we set the variance of the prior equal to the DES-AMBER score, $U_0$, of the conformation corresponding to $\mathbf{x}_0$ (see \nameref{ch6:methods:molecular-dynamics}; Fig. \ref{ch6:fig:schematic}c). The \nameref{ch6:sec:rnanneal} for a given conformation is computed from the log-likelihoods of the latent representations under the trained models. The log-likelihood calculation is summarized in Algorithm \ref{ch6:alg:diffusion-likelihood} and described in detail in Ref.~\cite{john2025comparison} Evaluating the log-likelihood requires choosing a variance for the prior; all of the results reported in the main text are generated at $T=1$, but we found the RNAnneal score to be robust with respect to choice of $T$ (Fig. S\ref{ch6:fig:model-temp-dependence}-S\ref{ch6:fig:acc-curve-summary}).
 
-\subsection{RNAnneal Score}
+{\color{red}\section{RNAnneal Score}}
 \phantomsection
 \setcurrentname{RNAnneal Score}
 \label{ch6:sec:rnanneal}
 
 RNAnneal scores conformations using an ensemble of \nameref{ch6:methods:thermodynamic-map} trained on geometric and energetic features extracted from a set of 3D conformations (Fig. \ref{ch6:fig:schematic}b-d). A total of 28 TMs are trained for each RNA, covering all four combinations of representations (\nameref{ch6:methods:rna-features}) and projections (PCA and \nameref{ch6:methods:spib}). For each feature-projection combination, the number of projection components $d$ varies from 2 to 8 inclusive. After training, the RNAnneal score is computed from the log-likelihoods of the training data under the TM ensemble (Algorithm \ref{ch6:alg:diffusion-likelihood} and \ref{ch6:alg:rnanneal-score}).
 
-\subsection{Reference Structures}
+{\color{red}\section{Reference Structures}}
 \phantomsection
 \setcurrentname{Reference Structures}
 \label{ch6:methods:preparation}
 
 RNAnneal's structure prediction performance was evaluated on a set of riboswitch sequences with structures that have been solved by high-resolution experimental methods (Table \ref{ch6:tab:riboswitches} and Fig. S\ref{ch6:fig:all-representatives}). The reference ERCs were prepared by downloading the associated Protein Data Bank (PDB) entry, removing any non-nucleic residues, filling in missing nucleobases using \nameref{ch6:methods:tertiary-struct}, and subsequently minimizing the conformation with the Rosetta energy function (see Algorithm \ref{ch6:alg:farfar-minimise}).
 
-\subsection{RMSD}
+{\color{red}\section{RMSD}}
 \phantomsection
 \setcurrentname{RMSD}
 \label{ch6:methods:rmsd}
@@ -360,7 +91,7 @@ Root Mean Squared Deviation (RMSD) is a metric commonly used to evaluate discrep
 \end{equation}
 where $d(\mathbf{x}_i, \mathbf{y}_i)$ measures the distance between the $i$-th atom in both models. The RMSD values for RNAnneal conformations and molecular dynamics simulations of the reference structure are reported in Fig. S\ref{ch6:fig:rmsd_decoys} and Fig. S\ref{ch6:fig:rmsd_reference}.
 
-\subsection{INF}
+{\color{red}\section{INF}}
 \phantomsection       \setcurrentname{INF}
 \label{ch6:methods:inf}
 
@@ -370,7 +101,7 @@ Interaction Network Fidelity (INF) quantifies the similarity between two conform
 \end{equation}
 where $\mathrm{TP} = S_m \cap S_r$ are interactions present in both structures, $\mathrm{FP} = S_m \ S_r$ are interactions present only in the model, and $\mathrm{FN} = S_r \ S_m$ are interactions present only in the reference. Minor, localized structural differences (e.g., at a helix junction) may yield large RMSD values due to poor global alignment. Because the INF compares interaction networks directly without requiring alignment, it is more robust to such variations and to thermal fluctuations. We compute the INF using the ClaRNA~\cite{walen2014clarna} implementation in \texttt{rna-tools}~\cite{magnus2020rna}. INF values are reported in Fig. S\ref{ch6:fig:inf-detailed} and S\ref{ch6:fig:inf_reference}-\ref{ch6:fig:inf_decoys}.
 
-\subsection{AUAC}
+{\color{red}\section{AUAC}}
 \phantomsection       \setcurrentname{AUAC}
 \label{ch6:methods:auac}
 The Area Under the Accumulation Curve (AUAC) is a metric suited for evaluating classification task performance (Fig. \ref{ch6:fig:schematic}e and \ref{ch6:fig:results}g).~\cite{truchon2007bedroc} Let $x\in [0,1]$ be the normalized rank and $f:r \rightarrow \{0,1\}$ be an associated set of labels, with $1$ indicating the positive (near-ERC) class and $0$ indicating the decoy class. The empirical CDF is then
@@ -384,7 +115,7 @@ and the area under the accumulation curve is
 \end{equation}
 When the $\mathrm{AUAC}$ is $1$, the classification is perfect, i.e., members of the positive class are always ranked above decoys. The accumulation curves for the 15 riboswitches investigated in the main text are provided in Fig. S\ref{ch6:fig:acc-curves} and S\ref{ch6:fig:acc-curve-summary}.
 
-\subsection{BEDROC}
+{\color{red}\section{BEDROC}}
 \phantomsection       \setcurrentname{BEDROC}
 \label{ch6:methods:bedroc}
 
@@ -400,7 +131,7 @@ which is normalized to obtain
 \end{equation}
 The tunable parameter $\alpha$ controls the focus on early recognition. Our choice of $\alpha=8$ is such that the top $20\%$ of the normalized rank contributes $80\%$ of the $w\mathrm{AUAC}$. Early recognition is a suitable evaluation metric when there is a large class imbalance and accurate classification among the highest ranks is essential.
 
-\subsection{Interaction Entropy}
+{\color{red}\section{Interaction Entropy}}
 \phantomsection       \setcurrentname{Interaction Entropy}
 \label{ch6:methods:interaction-entropy}
 Interaction entropy measures how heterogeneous each nucleobase’s interaction patterns are across an ensemble of conformations. First, each nucleobase $i$ is assigned a Leontis--Westhof (LW) base-base contact classification for every structure in the ensemble.~\cite{leontis2001geometric} The distribution of these classifications defines probabilities $p_i(c_j)$ for each contact $c$ with partner nucleotide $j$. The interaction entropy is then the Shannon entropy of this distribution,
@@ -409,7 +140,7 @@ H_i = -\sum_j \sum_{c \in \mathcal{C}} p_i(c_j) \,\log_2 p_i(c_j),
 \]
 where $\mathcal{C}$ denotes the set of LW classes. Expressing the Shannon entropy in bits lends a direct interpretation: a nucleotide with interaction entropy $H$ participates in $2^{H}$ distinct base-base interactions across the ensemble (Fig. \ref{ch6:fig:ensemble-results}b). The probabilities may be computed as unweighted frequencies or with prior weights associated to each structure. In this work we use state probabilities (see \nameref{ch6:methods:state-ranking}) computed from the RNAnneal score as prior weights.
 
-\subsection{State Ranking}
+{\color{red}\section{State Ranking}}
 \phantomsection       \setcurrentname{State Ranking}
 \label{ch6:methods:state-ranking}
 
@@ -1048,3 +779,270 @@ $w_{kl} = \exp[{-\overline{{s}}_{kl}}]$. We assign each populated bin a state la
   \caption{Molecular Dynamics Simulation Parameters.}
 \label{ch6:tab:parameters}
 \end{table}
+
+\begin{algorithm}[H]
+  \caption{Sampling RNA secondary structures with \texttt{EternaFold}}
+  \label{ch6:alg:eternafold-sampling}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{example.fa} (input sequence);\\
+    \texttt{N} (maximum number of samples, \texttt{5000})
+    \STATE \texttt{mkdir -p eternafold}
+    \STATE \texttt{EternaFold/src/contrafold sample example.fa} \\
+    \ \texttt{--params EternaFold/parameters/EternaFoldParams.v1} \\
+    \ \texttt{--nsamples N > eternafold/ef.ss}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Sampling RNA secondary structures with \texttt{LinearFold}}
+  \label{ch6:alg:linearfold-sampling}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{example.fa} (input sequence)
+    \STATE \texttt{mkdir -p linearfold-v}
+    \COMMENT {Vienna parameters}
+    \STATE \texttt{mkdir -p linearfold-c}
+    \COMMENT {CONTRAfold parameters}
+    \STATE \texttt{cat example.fa | linearfold --zuker --delta 1000 -V | tail -n +5 | awk '\{print \$1\}' > linearfold-v/zuker.ss} \\
+    \STATE \texttt{cat example.fa | linearfold --zuker --delta 1000       | tail -n +5 | awk '\{print \$1\}' > linearfold-c/zuker.ss}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Sampling RNA secondary structures with \texttt{LinearAliFold}}
+  \label{ch6:alg:linearalifold-sampling}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{example.fa} (input sequence);\\
+    \texttt{N} (maximum number of samples, \texttt{20000})
+    \STATE \texttt{mkdir -p linearalifold-v}
+    \COMMENT {Vienna parameters}
+    \STATE \texttt{mkdir -p linearalifold-bl}
+    \COMMENT {BL* parameters}
+
+    \STATE \texttt{cat example.fa | linearalifold.py -s N -e 1 > linearalifold-v/stochastic.ss}
+    \STATE \texttt{cat example.fa | linearalifold.py -s N -e 2 > linearalifold-bl/stochastic.ss}
+    \STATE \texttt{cat example.fa | linearalifold.py -p -B linearalifold-v/bpp.txt -M linearalifold-v/mea.ss -T linearalifold-v/threshknot.ss -C linearalifold-v/centroid.ss -e 1}
+    \STATE \texttt{cat example.fa | linearalifold.py -p -B linearalifold-bl/bpp.txt -M linearalifold-bl/mea.ss -T linearalifold-bl/threshknot.ss -C linearalifold-bl/centroid.ss -e 2}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Conformational sampling with FARFAR2}
+  \label{ch6:alg:rna_denovo}
+  \begin{algorithmic}[1]
+  \REQUIRE \texttt{SEQ} (input sequence);\\
+  \texttt{DB} (secondary structure in dot-bracket notation)
+    \STATE \texttt{rna\_denovo.default.linuxgccrelease} \\
+    \ \texttt{-sequence SEQ} \COMMENT {From \texttt{example.fa} in Algorithms \ref{ch6:alg:eternafold-sampling}-\ref{ch6:alg:linearalifold-sampling}} \\
+    \ \texttt{-secstruct DB} \COMMENT {\texttt{cat */*.ss | uniq} from Algorithms \ref{ch6:alg:eternafold-sampling}-\ref{ch6:alg:linearalifold-sampling}}\\
+    \ \texttt{-nstruct 1} \\
+    \ \texttt{-cycles 20000} \\
+    \ \texttt{-minimize\_rna true} \\
+    \ \texttt{-rna:denovo:rounds 10} \\
+    \ \texttt{-rna:denovo:minimize:minimize\_bps true} \\
+    \ \texttt{-rna:denovo:bps\_moves true}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Reference conformation preparation with FARFAR2}
+  \label{ch6:alg:farfar-minimise}
+  \begin{algorithmic}[1]
+    \REQUIRE \texttt{SEQ} (input sequence);\\
+    \texttt{REF} (reference PDB file)
+    \STATE \texttt{rna\_denovo.default.linuxgccrelease} \\
+    \ \texttt{-sequence \$(echo \$SEQ)} \COMMENT{lower‑case sequence} \\[-0.2em]
+    \ \texttt{-secstruct '.....'} \COMMENT{all bases unpaired; equal to length of \texttt{\$SEQ}} \\[-0.2em]
+    \ \texttt{-nstruct 1} \\[-0.2em]
+    \ \texttt{-out:file:silent \$(dirname \$REF)/silent.out} \\[-0.2em]
+    \ \texttt{-s \$REF} \COMMENT{experimental model} \\[-0.2em]
+    \ \texttt{-minimize\_rna true} \\[-0.2em]
+    \ \texttt{-rna:denovo:rounds 1} \\[-0.2em]
+    \ \texttt{-out:overwrite true} \\[-0.2em]
+    \ \texttt{-cycles 10000} \\[-0.2em]
+    \ \texttt{-rna:denovo:minimize:minimize\_bps true}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Unsupervised selection of diverse candidate conformations}
+  \label{ch6:alg:candidate-selection}
+  \begin{algorithmic}[1]
+    \REQUIRE FARFAR2 models $\{\mathbf{x}_i\}_{i=1}^{N}$; \\
+    Density‐peaks parameter $Z{=}3$;\\
+    Principal component range $d\!=\!2,3\ldots\,26$;\\
+    Target count $K{=}200$
+    \STATE Featurize each model $\mathbf{x}_i$ into a G-vector
+    \FOR{$d \in \{2,3,\dots,26\}$}
+      \STATE Project all G-vectors onto the first $d$ principal components
+      \STATE Cluster the projection with \texttt{dadapy} (advanced density peaks, $Z{=}3$)
+      \STATE Record the number of clusters obtained
+    \ENDFOR
+    \STATE Let $d^\ast$ be the dimension giving the maximum cluster count \COMMENT{see Fig.\,S\ref{ch6:fig:clusters_vs_d}}
+    \STATE Re-cluster the $d^\ast$-dimensional data to obtain $\{\mathcal{C}_j\}_{j=1}^{M}$
+    \FORALL{clusters $\mathcal{C}_j$}
+      \STATE Sort conformations in $\mathcal{C}_j$ by ascending Rosetta score
+    \ENDFOR
+    \STATE Sort the clusters by the best Rosetta score among all conformations in each cluster
+    \STATE $\mathcal{S} \leftarrow \varnothing$ \COMMENT{set of selected candidates}
+    \WHILE{$|\mathcal{S}| < K$}
+      \FOR{$j = 1$ \TO $M$}
+        \IF{$\mathcal{C}_j \neq \varnothing$}
+          \STATE Remove the top-scoring conformation $c$ from $\mathcal{C}_j$ and add $c$ to $\mathcal{S}$
+          \IF{$|\mathcal{S}| = K$}
+            \STATE \textbf{break}
+          \ENDIF
+        \ENDIF
+      \ENDFOR
+      \STATE Re-sort clusters by their current top-scoring conformation
+    \ENDWHILE
+    \RETURN $\mathcal{S}$ \COMMENT{200 candidate conformations}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Likelihood estimation for a thermodynamic map (diffusion model) using the Hutchinson trace estimator}
+  \label{ch6:alg:diffusion-likelihood}
+  \begin{algorithmic}[1]
+    \REQUIRE Observed frame $\mathbf{u}_{0}\equiv (\mathbf{x}_0, U_0)^\top$ (data at $t_0\equiv t={0}$); \\
+    Diffusion process $\mathcal{D}$ with time grid $\{t_{0}\!\!<\!\!t_{1}\!\!<\!\!\dots\!\!<\!\!t_{K}\}$; \\
+    One–step map $\mathrm{STEP}_{t_{k}\!\rightarrow t_{k+1}} \colon \mathbf{u}\!\mapsto\!\mathbf{u}'$; \COMMENT{Neural network} \\
+    Prior temperature $T$; \COMMENT{$T=1$ unless otherwise stated} \\
+    Temperature-dependent prior density $q_T(\mathbf{u}_{t_K})\equiv \mathcal{N}(0,T) \times \mathcal{N}(0,1)$; \COMMENT{Different priors for $\mathbf{x}$ and $U$} \\
+    Schedule of noise scales $\{\beta_{k}\}_{k=1}^{K}$; \\
+    Number of Hutchinson probe vectors $M$
+    \STATE $\mathbf{u}\leftarrow\mathbf{u}_{0}$  \COMMENT{state at the current time $t_{k}$}
+    \STATE $\mathcal{G}\leftarrow[\,]$          \COMMENT{to store divergence $g_{k}$}
+    \FOR{$k\;=\;0\;\mathbf{to}\;K-1$}
+      \STATE Draw $M$ probe vectors
+             $\bigl\{\mathbf{v}^{(m)}\bigr\}_{m=1}^{M}
+                    \sim\mathcal{N}\bigl(\mathbf{0},\mathbf{I}\bigr)$
+      \FORALL{probes $m=1,\dots,M$}
+        \STATE $(\mathbf{u}'^{(m)},\mathbf{Jv}^{(m)})\;
+               \leftarrow\;
+               \mathrm{JVP}\Bigl(
+                 \mathrm{STEP}_{t_{k}\!\rightarrow t_{k+1}},
+                 \mathbf{u},\,
+                 \mathbf{v}^{(m)}
+               \Bigr)$ \COMMENT{Jacobian‐vector product}
+      \ENDFOR
+      \STATE $\displaystyle
+             g_{k}\;\leftarrow\;
+             \frac{1}{M}
+             \sum_{m=1}^{M}
+               \bigl\langle
+                 \mathbf{Jv}^{(m)},\,\mathbf{v}^{(m)}
+               \bigr\rangle$
+             \COMMENT{Hutchinson trace estimate of $\nabla_{\!\mathbf{u}}\!\cdot\!\mathrm{STEP}$}
+      \STATE Append $g_{k}$ to $\mathcal{G}$
+      \STATE $\mathbf{u}\leftarrow\mathbf{u}'^{(1)}$ \COMMENT{all probes have the same output}
+    \ENDFOR
+
+    \STATE $\displaystyle
+           \Delta \ell_{pq}
+           \leftarrow
+           \operatorname{trapz}\bigl(\mathcal{G},\,
+                                    \{\beta_{k}\}_{k=1}^{K}\bigr)$
+           \COMMENT{trapezoidal integration on $(g_{k},\beta_{k})$}
+    \STATE $\displaystyle
+           \log q
+           \leftarrow
+           \log q_T\bigl(\mathbf{u}\bigr)$
+           \COMMENT{prior log‐density at $t_{K}$ at temperature $T$}
+    \STATE $\displaystyle
+           \log p_{\theta}\bigl(\mathbf{u}_{0}\bigr)
+           \leftarrow
+           \log q + \Delta_{pq}$
+    \RETURN $\log p_{\theta}(\mathbf{u}_{0})$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{RNAnneal Score}
+  \label{ch6:alg:rnanneal-score}
+  \begin{algorithmic}[1]
+    \REQUIRE
+    Log-likelihoods $\{L_{i}^{(\mathcal{F})}\}$;\\
+    Feature sets $\mathcal{F}=\{\text{G-vector},\text{R-vector}\}\times\{\text{PCA},\text{SPIB}\}$;\\
+    Component range $\mathcal{D}=2,3,\ldots,8$
+
+    \STATE $\displaystyle L_{\min}\leftarrow\min_{i}L_{i}$,\quad
+           $\displaystyle\sigma_{L}\leftarrow\sqrt{\operatorname{Var}\{L_{i}\}}$
+    \FORALL{frames $i$}
+      \STATE $\displaystyle l_{i}\;\leftarrow\;
+              {\bigl(L_{i}-L_{\min}\bigr)}\;
+              {/\;\sigma_{L}}$ \COMMENT{subtract min and divide by SD}
+    \ENDFOR
+      \STATE Sort $\{l_{i}\}$ in ascending order
+      \STATE Initialize lists $\mathcal{S} = [\,]$ and $\mathcal{L} = [\,]$
+    \FORALL{confrmers $i$}
+
+        \STATE $\mathcal{L}(i)\gets[\,]$
+        \FORALL{feature-projection pairs $(v,f)\in\mathcal{F}$}
+          \FORALL{dimensions $d\in\mathcal{D}$}
+              \STATE Append $l_{i}^{(v,f,d)}$ to $\mathcal{L}(i)$
+            \ENDFOR
+          \ENDFOR
+        \STATE Append {$\displaystyle\bar{s}_{i}
+               = \frac{1}{|\mathcal{L}(i)|}\sum_{l\in\mathcal{L}(i)}l$} to ${\mathcal{S}}(i)$
+               \COMMENT{{RNAnneal Score}}
+
+      \ENDFOR
+      \RETURN ${\mathcal{S}}(i)$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Interaction Entropy calculation}
+  \label{ch6:alg:interaction-entropy}
+  \begin{algorithmic}[1]
+    \REQUIRE Ensemble of conformations $\{X_{1},\dots,X_{M}\}$;\\
+             Nucleotides $i=1,\dots,N$; \\
+             Prior weights $\{w_{1},\dots,w_{M}\}$ with $\sum_{j} w_{j}=1$; \\
+             LW classification function $\mathrm{LW}(i,X_{j}) \rightarrow c \in \mathcal{C}$.
+    \FORALL{nucleotides $i=1,\dots,N$}
+      \STATE Initialize frequency table $f_{i}(c) \gets 0$ for all $c \in \mathcal{C}$
+      \FORALL{conformations $j=1,\dots,M$}
+        \STATE $c \gets \mathrm{LW}(i,X_{j})$
+        \STATE $f_{i}(c) \gets f_{i}(c) + w_{j}$
+      \ENDFOR
+      \STATE $p_{i}(c) \gets f_{i}(c) / \sum_{c' \in \mathcal{C}} f_{i}(c')$ \COMMENT{Normalize}
+      \STATE $H_{i} \gets -\sum_{c \in \mathcal{C}} p_{i}(c) \log_2 p_{i}(c)$
+    \ENDFOR
+    \RETURN $\{H_{i}\}_{i=1}^{N}$ \COMMENT{interaction entropies for all nucleotides}
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{Boltzmann‑weighted state ranking and representative selection}
+  \label{ch6:alg:state-ranking}
+  \begin{algorithmic}[1]
+    \REQUIRE\ SPIB projections $\{\mathbf{x}_{i}\}$;\\
+    State labels $\{y_{i}\}$;\\
+    RNAnneal scores $\{s_{i}\}$;\\ Frame keys $\{f_{i}\}$;\\ Histogram grid size $(K=25,L=25)$;\\ Minimum population $N_{\min}=10$;\\ Pre‑filter count $k_{\mathrm{top}}=10$;\\ Report count $k_{\mathrm{rep}}=10$
+    \STATE $\mathcal{F}\!\leftarrow\!\{(y_{i},\mathbf{x}_{i},s_{i},f_{i})\}$
+    \STATE Group $\mathcal{F}$ by state label to obtain $\{\mathcal{F}_y\}$
+    \STATE Discard states with $|\mathcal{F}_y|<N_{\min}$
+    \STATE Compute the average score $\bar{s}_y $ for every surviving state
+    \STATE Keep the $k_{\mathrm{top}}$ states with the lowest $\bar{s}_y$
+    \STATE Initialise histogram $H$ on an $K\times L$ grid over 2D IB space
+    \FORALL{frames $(y,\mathbf{x},s,f)\in\bigcup\mathcal{F}_y$}
+      \STATE Increment $H$ at the bin containing $\mathbf{x}$ with $(s,y)$
+    \ENDFOR
+    \FORALL{occupied bins $(k,l)$}
+      \STATE $\bar{s}_{kl}\!\leftarrow\!\text{mean score in bin }(k,l)$
+      \STATE $w_{kl}\!\leftarrow\!\exp(-\bar{s}_{kl})$ \COMMENT{Boltzmann weight in bin $h_{kl}$}
+      \STATE $y^\ast\!\leftarrow\!\arg\max_y\{\text{count of }y\text{ in }(k,l)\}$ \COMMENT{State assigned to bin $h_{kl}$}
+      \STATE $W_{y^\ast}\!\leftarrow\!W_{y^\ast}+w_{kl}$ \COMMENT{Each bin $h_{kl}$ with state $y^\ast$ contributes $w_{kl}$ to the total state weight $W_{y^\ast}$}
+    \ENDFOR
+    \STATE $p_y\!\leftarrow\!W_y\,/\,\sum_{y'}W_{y'}$ \COMMENT{Normalize weights}
+    \STATE Order states by $p_y$ (descending) to obtain $(y_{(1)},\dots,y_{(k_{\mathrm{rep}})})$
+    \FOR{$r=1$ \TO $k_{\mathrm{rep}}$}
+      \STATE $y\!\leftarrow\!y_{(r)}$
+      \STATE $\mathcal{F}_y\!\leftarrow\!\{(s,f)\in\mathcal{F}_y\}$
+      \STATE $f^\ast\!\leftarrow\!\arg\min_{(s,f)\in\mathcal{F}_y}\{s\}$ \COMMENT{representative frame}
+
+      \STATE Record $\bigl(r,y,p_y,f^\ast\bigr)$
+    \ENDFOR
+    \RETURN\ Table of the $k_{\mathrm{rep}}$ most‑probable states with their representatives
+  \end{algorithmic}
+\end{algorithm}

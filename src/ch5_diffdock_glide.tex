@@ -7,6 +7,8 @@
  
 
 \section{Introduction}
+The previous chapter introduced RNAnneal, a modeling pipeline that uses a series of physics-based models to generate candidate RNA structures and a probabilistic generative model to score them. This chapter explores the reverse arrangement through DiffDock-Glide, a molecular docking method that uses a probabilistic generative model proposes candidate protein-ligand poses and a physics-based model to score them.
+
 Structure-based drug design is a paradigm of drug discovery that uses structural information to rationally design small molecules that bind to targets with high specificity and affinity. \cite{anderson2003process} Computational approaches have proven indispensable for reducing the vast space of possible molecules to a small number of potentially high-affinity binders.~\cite{shoichet2004virtual,pagadala2017software,klarich2024thompson} Historically, the most successful computational strategies have been physics-based molecular docking models that explicitly account for energetic~\cite{trott2010autodock,verdonk2003gold,friesner2004glide,allen2015dock} and entropic~\cite{murphy2016wscore} contributions to the binding free energy. 
 
 But, in recent years, alternative approaches rooted in deep learning have emerged, all of which share a core assumption that the relevant chemical interactions are represented in structural and evolutionary data and can be implicitly modeled by a neural network. In a foundational application of deep learning to biology and chemistry, AlphaFold2 (AF2) modeled protein structure to unprecedented accuracy by training an artificial intelligence system on coevolutionary information and the structural contents of the Protein Data Bank (PDB).~\cite{alphafold-2} Since AF2 there has been a dramatic increase in deep learning methods for predicting structures that arise from molecular interactions~\cite{RF-AA,alphafold-3}, including ones specifically focused on molecular docking. \cite{diffdock,qiao2024neuralplexer} 
@@ -21,11 +23,9 @@ In this work, we present a hybrid physics-based and deep learning approach to mo
 
 We benchmark our method, called DiffDock-Glide, on the Posebusters dataset, demonstrating improved generalization to novel sequences and sampling of near-native binding poses compared to DiffDock alone. We also virtual screen compounds from the DUD-E~\cite{mysinger2012dude} dataset against AF2-generated receptor structures and obtain enrichment values that broadly surpass those obtained from Glide or DiffDock alone.
 
-\section{Method}
-
 The hybrid molecular docking model has two stages. The first stage involves generating a set of potential binding poses using the DiffDock model and a modified generative process that optionally restricts generation to a putative binding site. The second stage involves refining and scoring the generated poses using Glide. 
 
-\subsection{Binding site-conditional DiffDock}
+{\color{red}\section{Binding site-conditional DiffDock}}
 
 DiffDock is a diffusion model that predicts binding poses for a small-molecule given its chemical identity and a target protein structure. It is a {\it blind} docking algorithm -- anywhere inside or on the target protein's surface is a potential binding site. But, in a realistic structure-based drug discovery setting, one often knows the location of the binding site and would like to explore poses therein. To this end, we bias DiffDock's generative process towards the location of the site using the particle guidance framework.~\cite{corso2023particle} We will briefly summarize the core operating principles of DiffDock before introducing the biasing mechanism.
 
@@ -59,7 +59,7 @@ A flat-bottomed harmonic potential $\Phi$ characterizes the geometry and locatio
 \end{equation}
 The function $d$ measures the distance between $\mathbf{r}$ and $\mathbf{r}_0$, $r_{\mathrm{min}}$ is the inner radius, and the outer radius $r_{\mathrm{max}}$ limits the gradient for numerical stability. The strength of the potential is controlled by $\gamma$. When $\gamma=0$ the generative process in Eq. \ref{ch5:eq:diffdock-sde}, is {\it unconditional}, i.e. the center of geometry $\mathbf{r}$ freely explores the entire protein surface; in contrast, when $\gamma > 0$, the generative process is {\it conditional} and the center of geometry is biased by $\Phi$ towards a spherical region of radius $r_\mathrm{min}$ centered around $\mathbf{r}_0$. The orthogonality of the groups factoring $\mathbb{P}$ guarantees that the rotational degrees of freedom of the generative process are unaffected by the translational bias.
 
-\subsection{DiffDock--Glide}
+{\color{red}\section{DiffDock--Glide}}
 Since researchers are often interested in a small subset of representative poses, the samples from DiffDock ought to be scored and rank-ordered based on their plausibility. The original DiffDock implementation trains a separate neural network, called a confidence model, to predict a score that indicates if a pose is likely to be less than $2${\AA} in root mean square deviation (RMSD) from a crystal pose. We take a different approach in using the ranking mechanism to introduce further inductive biases and evaluate pose quality without reference to the generative model or its training dataset.
 
 Buttenschoen et. al. have previously shown that subtle features of real binding poses that are absent from the generated poses can be recovered by minimization under a molecular mechanics force field.~\cite{buttenschoen2024posebusters} Accordingly, we use Glide's post-docking minimization pipeline to score and refine the generated poses. The pipeline optimizes ligand-receptor and intramolecular ligand interactions through rigid-body roto-translations and rotatable bonds optimizations under the OPLS-AA force field.~\cite{friesner2004glide} The minimized complexes are then ranked using Glide's scoring function, which has been empirically parameterized to approximate the binding free energy by rewarding or penalizing interactions, e.g. hydrogen bonding, van der Waals, hydrophobic, electrostatic interactions and internal strain energy.~\cite{friesner2004glide} 

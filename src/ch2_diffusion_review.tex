@@ -133,10 +133,7 @@ where $\mathbf{B}_t$ is a Brownian motion. The linear drift in Eq. \ref{ch2:eq:d
 A continuous-time generative model must be both (i) reversible to transport samples from $q(\mathbf{x}')$ to those of $p(\mathbf{x})$ and (ii) invertible to guarantee that the change of measure identity may be applied. Indeed, the diffusion equation is time-reversible under the change of variable $\tau = 1 - t$, and, remarkably, the time-reverse of the SDE in Eq. \ref{ch2:eq:sde-fwd} is
 \begin{equation}
     \label{ch2:eq:sde-bck}
-    \begin{aligned}
-        \mathrm{d}\mathbf{x} =& -\lambda(\tau) \left[ \mathbf{x} + \nabla \log p(\mathbf{x},\tau) \right] \mathrm{d}\tau \\
-        &+ \sqrt{2 \lambda(\tau)} \, \mathrm{d}\mathbf{B}_\tau.
-    \end{aligned}
+    \mathrm{d}\mathbf{x} = -\lambda(\tau) \left[ \mathbf{x} + \nabla \log p(\mathbf{x},\tau) \right] \mathrm{d}\tau + \sqrt{2 \lambda(\tau)} \, \mathrm{d}\mathbf{B}_\tau.
 \end{equation}
 The invertibility condition is satisfied when the variance of $\mathbf{B}_\tau$ is zero, with the resulting dynamics being described by the probability flow ODE:
 \begin{equation}
