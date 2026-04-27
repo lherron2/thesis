@@ -2,35 +2,35 @@
 % Appendix C: Supplementary Material for Chapter 5
 % Source: extracted from src/ch6_rnaanneal.tex
 
-{\color{red}\section{Secondary Structure Prediction}}
+\section{Secondary Structure Prediction}
 \phantomsection
 \setcurrentname{Secondary Structure Prediction}
 \label{ch6:methods:sec-struct}
 The secondary structure of an RNA is a simplified representation that specifies Watson-Crick base pairing. There are numerous, long-standing approaches available to predict secondary structures from the primary sequence.~\cite{sato2023recent} RNAnneal relies on three programs to predict RNA secondary structures: EternaFold~\cite{wayment2022rna}, LinearFold~\cite{huang2019linearfold}, and LinearAliFold~\cite{huang2019linearfold}. EternaFold is a probabilistic method for secondary structure prediction that
 has been benchmarked against several widely used secondary structure prediction algorithms (Algorithm \ref{ch6:alg:eternafold-sampling}). LinearFold is an algorithm for predicting secondary structures that has linear runtime with sequence length (Algorithm \ref{ch6:alg:linearfold-sampling}). LinearAliFold extends the functionality of LinearFold by implementing stochastic sampling (Algorithm \ref{ch6:alg:linearalifold-sampling}). After a large number of secondary structures have been predicted by the above methods, the structures are aggregated and redundant ones are filtered out.  Fig. S\ref{ch6:fig:sec-struct-eval} measures the fraction of correctly predicted bases for the predicted distributions of secondary structures for each riboswitch.
 
-{\color{red}\section{FARFAR2}}
+\section{FARFAR2}
 \phantomsection
 \setcurrentname{FARFAR2}
 \label{ch6:methods:tertiary-struct}
 
 Rosetta's Fragment Assembly of RNA with Full-Atom Refinement (FARFAR) is a hybrid knowledge- and physics-based approach to sampling models of 3D RNA structure.~\cite{das2010atomic} FARFAR samples 3D models by performing Monte Carlo sampling on a low-resolution potential using a library of experimentally validated structure fragments, and then relaxes the structure in a higher-resolution all-atom potential. The quality of the conformations is evaluated by the Rosetta score. FARFAR2 further improves the performance of FARFAR with updates to the sampling algorithms, scoring weights, and fragment libraries.~\cite{watkins2020farfar2} The Rosetta score referred to in the main text and Fig. \ref{ch6:fig:results}g-h corresponds to the \texttt{rna\_hires.wts} file in Rosetta v2021.16.61629. Algorithm \ref{ch6:alg:rna_denovo} describes how RNAnneal uses FARFAR2 to sample a candidate model of the 3D structure with the primary sequence and a secondary structure as input.
 
-{\color{red}\section{Clustering}}
+\section{Clustering}
 \phantomsection
 \setcurrentname{Clustering}
 \label{ch6:methods:representatives}
 
 A crucial step in RNAnneal is selecting representative conformations to simulate (see \nameref{ch6:methods:molecular-dynamics}) from the set of structures predicted by \nameref{ch6:methods:tertiary-struct}. To sample diverse conformations, we first compute G-vectors for the FARFAR2 conformations (see \nameref{ch6:methods:rna-features}), and then project the G-vectors onto $d=2,3,\ldots,26$ principal components. For each $d$ value, the data is clustered using the advanced density peaks algorithm~\cite{d2021automatic} implemented in \texttt{dadapy}~\cite{glielmo2022dadapy} with $Z=3$. Representatives are selected based on the the $d$ value that yields the maximum number of clusters (Fig. S\ref{ch6:fig:clusters_vs_d}). To select, e.g., 200 candidate structures, we first sort the conformations within each cluster based on their Rosetta score and then sort the clusters based on the top-scoring conformation in each cluster. The clusters are then traversed in order, and the top-scoring conformation is selected as a representative and subsequently removed from the cluster. If there are fewer than 200 candidate structures after all clusters have been traversed, then they are reordered based on the new top-scoring conformation and the selection procedure is repeated until 200 conformations are obtained. The entire procedure is detailed in Algorithm \ref{ch6:alg:candidate-selection}.
 
-{\color{red}\section{Molecular Dynamics}}
+\section{Molecular Dynamics}
 \phantomsection
 \setcurrentname{Molecular Dynamics}
 \label{ch6:methods:molecular-dynamics}
 
 RNAnneal simulates models of 3D RNA structure with implicit solvent MD in order to introduce variations in structure caused by the thermal environment. The simulations are conducted under the NVT ensemble using the OpenMM simulation engine and the DES-AMBER RNA force field.~\cite{eastman2023openmm,DE-Shaw-RNA-ff} The conformations are equilibrated by gradually increasing the temperature from $1$K to $300$K and then increasing the integration timestep from $1$fs to the production integration timestep of $5$fs (Table \ref{ch6:tab:schedule}). The production simulation is 100ns and frames are saved at 1ns intervals; additional simulation parameters like ion concentration and solvent model are provided in Table \ref{ch6:tab:parameters}. The DES-AMBER score is the potential energy of the MD simulations (i.e., the energy values of the force field and solvent model) standardized by first aggregating the energy across all simulations (for a given RNA) and then subtracting the minimum value and dividing the standard deviation.
 
-{\color{red}\section{R- and G-vectors}}
+\section{R- and G-vectors}
 \phantomsection
 \setcurrentname{R- and G-vectors}
 \label{ch6:methods:rna-features}
@@ -48,7 +48,7 @@ tensor consisting of G-vectors that capture the geometry of localized base-pairi
 \end{gather}
 where $\Theta$ is a step function, $r_c$ is a cutoff of $2.4${\AA}, and $\gamma=\pi/r_c$.
 
-{\color{red}\section{SPIB}}
+\section{SPIB}
 \phantomsection
 \setcurrentname{SPIB}
 \label{ch6:methods:spib}
@@ -57,7 +57,7 @@ The State Predictive Information Bottleneck (SPIB) framework allows one to embed
 
 % \lipsum[8]
 
-{\color{red}\section{Thermodynamic Maps}}
+\section{Thermodynamic Maps}
 \phantomsection
 \setcurrentname{Thermodynamic Maps}
 \label{ch6:methods:thermodynamic-map}
@@ -66,21 +66,21 @@ A thermodynamic map (TM) is a diffusion model variant that models the dependence
 
 % A thermodynamic map (TM) is a diffusion model variant that models the dependence of a structural ensemble on physical parameters like temperature, pressure, or chemical potential by representing these parameters in the prior distribution.~\cite{herron2024inferring,exptm,beyerle2025inferring} The TM model can then be used to generate new samples or evaluate the likelihood of existing samples at a given temperature. In Ref. \cite{herron2024inferring}, for example, structures observed at a low temperature are mapped onto a prior with a small variance (i.e., a low temperature) while high-temperature samples are mapped onto a prior with large variance. In this work we modify the construction so that the TM encodes both the free- and potential-energy landscape of an RNA molecule: conformations that are low-lying on the energy landscape are mapped onto a low-variance prior, while those high on the energy landscape are mapped onto a high-variance prior. More concretely, for a given representation $\mathbf{x}_0$, we set the variance of the prior equal to the DES-AMBER score, $U_0$, of the conformation corresponding to $\mathbf{x}_0$ (see \nameref{ch6:methods:molecular-dynamics}; Fig. \ref{ch6:fig:schematic}c). The \nameref{ch6:sec:rnanneal} for a given conformation is computed from the log-likelihoods of the latent representations under the trained models. The log-likelihood calculation is summarized in Algorithm \ref{ch6:alg:diffusion-likelihood} and described in detail in Ref.~\cite{john2025comparison} Evaluating the log-likelihood requires choosing a variance for the prior; all of the results reported in the main text are generated at $T=1$, but we found the RNAnneal score to be robust with respect to choice of $T$ (Fig. S\ref{ch6:fig:model-temp-dependence}-S\ref{ch6:fig:acc-curve-summary}).
 
-{\color{red}\section{RNAnneal Score}}
+\section{RNAnneal Score}
 \phantomsection
 \setcurrentname{RNAnneal Score}
 \label{ch6:sec:rnanneal}
 
 RNAnneal scores conformations using an ensemble of \nameref{ch6:methods:thermodynamic-map} trained on geometric and energetic features extracted from a set of 3D conformations (Fig. \ref{ch6:fig:schematic}b-d). A total of 28 TMs are trained for each RNA, covering all four combinations of representations (\nameref{ch6:methods:rna-features}) and projections (PCA and \nameref{ch6:methods:spib}). For each feature-projection combination, the number of projection components $d$ varies from 2 to 8 inclusive. After training, the RNAnneal score is computed from the log-likelihoods of the training data under the TM ensemble (Algorithm \ref{ch6:alg:diffusion-likelihood} and \ref{ch6:alg:rnanneal-score}).
 
-{\color{red}\section{Reference Structures}}
+\section{Reference Structures}
 \phantomsection
 \setcurrentname{Reference Structures}
 \label{ch6:methods:preparation}
 
 RNAnneal's structure prediction performance was evaluated on a set of riboswitch sequences with structures that have been solved by high-resolution experimental methods (Table \ref{ch6:tab:riboswitches} and Fig. S\ref{ch6:fig:all-representatives}). The reference ERCs were prepared by downloading the associated Protein Data Bank (PDB) entry, removing any non-nucleic residues, filling in missing nucleobases using \nameref{ch6:methods:tertiary-struct}, and subsequently minimizing the conformation with the Rosetta energy function (see Algorithm \ref{ch6:alg:farfar-minimise}).
 
-{\color{red}\section{RMSD}}
+\section{RMSD}
 \phantomsection
 \setcurrentname{RMSD}
 \label{ch6:methods:rmsd}
@@ -91,7 +91,7 @@ Root Mean Squared Deviation (RMSD) is a metric commonly used to evaluate discrep
 \end{equation}
 where $d(\mathbf{x}_i, \mathbf{y}_i)$ measures the distance between the $i$-th atom in both models. The RMSD values for RNAnneal conformations and molecular dynamics simulations of the reference structure are reported in Fig. S\ref{ch6:fig:rmsd_decoys} and Fig. S\ref{ch6:fig:rmsd_reference}.
 
-{\color{red}\section{INF}}
+\section{INF}
 \phantomsection       \setcurrentname{INF}
 \label{ch6:methods:inf}
 
@@ -101,7 +101,7 @@ Interaction Network Fidelity (INF) quantifies the similarity between two conform
 \end{equation}
 where $\mathrm{TP} = S_m \cap S_r$ are interactions present in both structures, $\mathrm{FP} = S_m \ S_r$ are interactions present only in the model, and $\mathrm{FN} = S_r \ S_m$ are interactions present only in the reference. Minor, localized structural differences (e.g., at a helix junction) may yield large RMSD values due to poor global alignment. Because the INF compares interaction networks directly without requiring alignment, it is more robust to such variations and to thermal fluctuations. We compute the INF using the ClaRNA~\cite{walen2014clarna} implementation in \texttt{rna-tools}~\cite{magnus2020rna}. INF values are reported in Fig. S\ref{ch6:fig:inf-detailed} and S\ref{ch6:fig:inf_reference}-\ref{ch6:fig:inf_decoys}.
 
-{\color{red}\section{AUAC}}
+\section{AUAC}
 \phantomsection       \setcurrentname{AUAC}
 \label{ch6:methods:auac}
 The Area Under the Accumulation Curve (AUAC) is a metric suited for evaluating classification task performance (Fig. \ref{ch6:fig:schematic}e and \ref{ch6:fig:results}g).~\cite{truchon2007bedroc} Let $x\in [0,1]$ be the normalized rank and $f:r \rightarrow \{0,1\}$ be an associated set of labels, with $1$ indicating the positive (near-ERC) class and $0$ indicating the decoy class. The empirical CDF is then
@@ -115,7 +115,7 @@ and the area under the accumulation curve is
 \end{equation}
 When the $\mathrm{AUAC}$ is $1$, the classification is perfect, i.e., members of the positive class are always ranked above decoys. The accumulation curves for the 15 riboswitches investigated in the main text are provided in Fig. S\ref{ch6:fig:acc-curves} and S\ref{ch6:fig:acc-curve-summary}.
 
-{\color{red}\section{BEDROC}}
+\section{BEDROC}
 \phantomsection       \setcurrentname{BEDROC}
 \label{ch6:methods:bedroc}
 
@@ -131,7 +131,7 @@ which is normalized to obtain
 \end{equation}
 The tunable parameter $\alpha$ controls the focus on early recognition. Our choice of $\alpha=8$ is such that the top $20\%$ of the normalized rank contributes $80\%$ of the $w\mathrm{AUAC}$. Early recognition is a suitable evaluation metric when there is a large class imbalance and accurate classification among the highest ranks is essential.
 
-{\color{red}\section{Interaction Entropy}}
+\section{Interaction Entropy}
 \phantomsection       \setcurrentname{Interaction Entropy}
 \label{ch6:methods:interaction-entropy}
 Interaction entropy measures how heterogeneous each nucleobase’s interaction patterns are across an ensemble of conformations. First, each nucleobase $i$ is assigned a Leontis--Westhof (LW) base-base contact classification for every structure in the ensemble.~\cite{leontis2001geometric} The distribution of these classifications defines probabilities $p_i(c_j)$ for each contact $c$ with partner nucleotide $j$. The interaction entropy is then the Shannon entropy of this distribution,
@@ -140,7 +140,7 @@ H_i = -\sum_j \sum_{c \in \mathcal{C}} p_i(c_j) \,\log_2 p_i(c_j),
 \]
 where $\mathcal{C}$ denotes the set of LW classes. Expressing the Shannon entropy in bits lends a direct interpretation: a nucleotide with interaction entropy $H$ participates in $2^{H}$ distinct base-base interactions across the ensemble (Fig. \ref{ch6:fig:ensemble-results}b). The probabilities may be computed as unweighted frequencies or with prior weights associated to each structure. In this work we use state probabilities (see \nameref{ch6:methods:state-ranking}) computed from the RNAnneal score as prior weights.
 
-{\color{red}\section{State Ranking}}
+\section{State Ranking}
 \phantomsection       \setcurrentname{State Ranking}
 \label{ch6:methods:state-ranking}
 

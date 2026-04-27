@@ -39,7 +39,7 @@ We demonstrate the broad applicability of thermodynamic maps for three complex s
 
 Given this demonstration of applicability, we believe that thermodynamic maps will be found useful for the characterization of complex phase transitions in diverse systems, especially those with multiple phases. For example, local minima within the energy landscape of biomolecular systems are often biologically and functionally relevant \cite{excited-states}, and while they have been historically challenging to characterize computationally, we are able to study them with thermodynamic maps. The computational efficiency of the learning algorithm and scalability due to not requiring samples from the global equilibrium distribution make thermodynamic maps especially suitable for studying large-scale systems exhibiting complex behavior across long timescales.
 
-{\color{red}\section{Targeted Free Energy Perturbation}}
+\section{Targeted Free Energy Perturbation}
 \label{ch4:sec:TFEP}
 
 % \subsubsection{Targeted Free Energy Perturbation}
@@ -64,7 +64,7 @@ Using Eq. \ref{ch4:eq:normalization} free energy differences computed under $\ma
 
 Clearly using Eqs. \ref{ch4:eq:TFEP-mapping} and \ref{ch4:eq:normalization} depends on specifying a map that increases the overlap between states and has a tractable Jacobian. Finding a suitable mapping is difficult due to the often complex, high-dimensional nature of the configurations; as a result, the most successful approaches to TFEP represent $\mathcal{M}$ with a neural network \cite{tfep-2020,LFEP}. Likelihood-based models have been especially appealing since they meet both conditions \cite{NFReview,Dinh2017RealNVP,NeuralODE}, but have drawbacks of reduced expressivity and robustness \cite{bbvi}. Recent lines of work have improved both aspects -- for example, by pursuing more expressive black-box operations or incorporating stochasticity \cite{smooth-NF,neural-spline,AIS-NF,StochasticNF}. In the following sections, we bypass these issues of finding a suitable mapping by exploring non-equilibrium diffusion processes as general-purpose maps.
 
-{\color{red}\section{Leveraging Non-Equilibrium Thermodynamics}}
+\section{Leveraging Non-Equilibrium Thermodynamics}
 \label{ch4:sec:FPE}
 
 \begin{figure}
@@ -109,7 +109,7 @@ While particles simulated under Eq. \ref{ch4:eq:FPE-SDE} approach equilibrium, p
 
 Since the diffusion process meets the TFEP criteria we are now faced with evaluating the forward and reverse processes using the PDE in Eq. \ref{ch4:eq:FPE-PDE} or the pair of SDEs in Eqs. \ref{ch4:eq:FPE-SDE} and \ref{ch4:eq:FPE-SDE-bck}. In either case, one must estimate either the {\it log-likelihood} -- $\log p(\mathbf{x}, t)$, or the {\it score} --  $\nabla \log p(\mathbf{x}, t)$. Generative models can be broadly categorized based on which quantity they estimate: likelihood-based models solve the PDE by parameterizing the log-likelihood \cite{NeuralODE, Noe2019Boltzmann, NFReview}, while score-based models solve the SDEs by parameterizing the score \cite{Song2021ScoreBased, Ho2020DDPM}. The relationship between the likelihood and the score is depicted in Figures \ref{ch4:fig:OU}A and \ref{ch4:fig:OU}B. In this work we focus primarily on score-based models.
 
-{\color{red}\section{Score-Based Models}}
+\section{Score-Based Models}
 
 Score-based models (SBMs) have emerged as a robust method for generating independent samples from intractable probability distributions \cite{Song2021ScoreBased}. Using the reverse diffusion in Eq. \ref{ch4:eq:FPE-SDE-bck}, SBMs transport a simple {\it prior} distribution to a potentially complex {\it target} probability density that is characterized by a collection of samples $\mathcal{D}$. The model approximates the score of Eq. \ref{ch4:eq:FPE-SDE}, which is used to simulate Eq. \ref{ch4:eq:FPE-SDE-bck} -- having the effect of transporting samples from the prior distribution to the target. In an abuse of notation, we define the target distribution as $p(\mathbf{x}) \equiv p(\mathbf{x},t=0)$ and the prior distribution as $q(\mathbf{x}) \equiv p(\mathbf{x},t=1)$.
 
@@ -128,7 +128,7 @@ A SBM uses a neural network to model $\mathbf{s}_\theta(\mathbf{x}, t) \approx \
 
 Once trained, estimates of the score predicted by the network can be used to simulate Eq. \ref{ch4:eq:FPE-SDE-bck}. If the estimates are sufficiently accurate, then the endpoints of the trajectories launched from $q(\mathbf{x})$ are independent and identically distributed samples from $p(\mathbf{x})$. In the next section, we provide an alternative construction wherein $q(\mathbf{x})$ is viewed as the distribution arising from the dynamics of a physical system.
 
-{\color{red}\section{Thermodynamic Maps}}
+\section{Thermodynamic Maps}
 
 \begin{figure*}
     \centering
@@ -193,7 +193,7 @@ A thermodynamic map maps the thermodynamics of a target system $p(\mathbf{x},\bm
 
 In the generalized construction above we have assumed that each degree of freedom of $\mathbf{x}$ is coupled to a separate bath defined by the entries of $\bm{\beta}$, but in most cases physical systems are coupled to a single bath. If samples of $p(\mathbf{x},\bm{\beta})$ are from the global equilibrium distribution of an ensemble defined by $\beta_\mathrm{bath}$, each entry of $\bm{\beta}$ should be equal to $\beta_\mathrm{bath}$. However, global equilibrium distribution is often not attainable in practice (e.g. in molecular dynamics simulations). In this case, allowing each degree of freedom of $\mathbf{x}$ to be coupled to separate baths $\bm{\beta}$ allows the global equilibrium distribution to be inferred from samples gathered under a local equilibrium distribution. In Appendix \ref{ch4:app:fluctuations} we discuss how the global equilibrium distribution can be inferred from local equilibrium samples if one assumes that $\bm{\beta}$ varies linearly with $\beta_{\mathrm{bath}}$. In Section \ref{ch4:sec:RNA} we demonstrate the validity of the assumption by inferring the global equilibrium distribution from short, independent molecular dynamics simulations of two RNAs.
 
-{\color{red}\section{Critical Behavior of the Ising Model}}
+\section{Critical Behavior of the Ising Model}
 \label{ch4:sec:ising}
 
 We apply thermodynamic maps to the most widely studied formulation of the classical Ising model as a system of interacting spins arranged on a two-dimensional square lattice, without the presence of an external magnetic field. Arguably, this model serves as a prototypical example of a simple system with a complex phase transition. Each spin can have one of two states with value $\sigma=+1$ or $\sigma=-1$, and the spins interact with their nearest neighbors through an interaction term $J$ and Hamiltonian given by 
@@ -222,7 +222,7 @@ Figure \ref{ch4:fig:ising-model-mag}A shows the behavior of the magnetization fo
 
 These results highlight the ability of our model to infer the non-trivial thermodynamic behavior of phase transitions without being shown samples from the transition region; the physical meaning of temperature in the prior system has been transferred to the complex system, complete with the statistics properties associated with critical behavior. The correct prediction of $T_m$, even with asymmetrically spaced training temperatures, indicates our model has learned the physics of the Ising model, not merely the distribution of structures at each temperature.
 
-{\color{red}\section{Exploring RNA Conformational Landscapes with Thermodynamic Map-accelerated Molecular Dynamics (TM-aMD)}}
+\section{Exploring RNA Conformational Landscapes with Thermodynamic Map-accelerated Molecular Dynamics (TM-aMD)}
 \label{ch4:sec:RNA}
 
 \begin{figure*}[h!]
@@ -296,7 +296,7 @@ Finally, as presented, thermodynamic maps are not informative of kinetics since 
 
 Overall, we have presented thermodynamic maps as an exciting way of integrating score-based generative modeling with the theoretical framework of statistical mechanics. We have demonstrated the capability of thermodynamic maps to learn physics by predicting the critical behavior associated with the Ising Model despite limited, deliberately misleading sampling. We also use thermodynamic maps to accelerate Molecular Dynamics (TM-aMD) and show that TM-aMD efficiently infers the equilibrium distribution of two model RNA systems using a fraction of the computational resources required by replica exchange simulations. The TM-aMD method, combined with experimentally measured melting curves, might also prove useful for improving force fields for RNA and similar systems. Based on these results, we believe that thermodynamic maps are suitable for widespread use and have great potential for further theoretical development and computational optimization.
 
-\textcolor{black}{The next chapter builds on this thermodynamic framework by embedding Thermodynamic Maps in a full \textit{ab initio} RNA structure-prediction pipeline, RNAnneal, where they serve as the central component for ranking candidate RNA structures.}
+The next chapter builds on this thermodynamic framework by embedding Thermodynamic Maps in a full \textit{ab initio} RNA structure-prediction pipeline, RNAnneal, where they serve as the central component for ranking candidate RNA structures.
 
 
 % \section{Code Availability}

@@ -1,59 +1,59 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Model accuracy results for the 4-modal Gaussian mixture dataset.}}{21}{figure.2.1}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Model accuracy results for the 50-dimensional Gaussian mixture dataset.}}{23}{figure.2.2}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Free energy difference estimation accuracy on asymmetric bimodal distributions.}}{25}{figure.2.3}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Speed and model size results for the 4-modal Gaussian mixture dataset.}}{27}{figure.2.4}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Model accuracy results and generated data for the Aib9 peptide.}}{28}{figure.2.5}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Model accuracy results for the 4-modal Gaussian mixture dataset.}}{23}{figure.2.1}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Model accuracy results for the 50-dimensional Gaussian mixture dataset.}}{25}{figure.2.2}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Free energy difference estimation accuracy on asymmetric bimodal distributions.}}{27}{figure.2.3}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Speed and model size results for the 4-modal Gaussian mixture dataset.}}{29}{figure.2.4}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Model accuracy results and generated data for the Aib9 peptide.}}{30}{figure.2.5}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces DDPM neural network architecture.}}{36}{figure.3.1}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces AIB9 structure and free energy profile.}}{37}{figure.3.2}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Samples from REMD and DDPM at 400 K.}}{39}{figure.3.3}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Extrapolated free energy differences at 400 K.}}{41}{figure.3.4}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces GACC samples and free energy profile at 325 K.}}{42}{figure.3.5}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces DDPM neural network architecture.}}{38}{figure.3.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces AIB9 structure and free energy profile.}}{39}{figure.3.2}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Samples from REMD and DDPM at 400 K.}}{41}{figure.3.3}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Extrapolated free energy differences at 400 K.}}{43}{figure.3.4}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces GACC samples and free energy profile at 325 K.}}{44}{figure.3.5}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Transporting a probability distribution with a diffusion process.}}{50}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Illustration of a thermodynamic map between systems.}}{53}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Inferring the phase transition of the 2D Ising model from limited sampling.}}{56}{figure.4.3}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces GCAA Tetraloop Conformational Landscape.}}{58}{figure.4.4}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces HIV-TAR RNA Conformational Landscape.}}{62}{figure.4.5}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Transporting a probability distribution with a diffusion process.}}{52}{figure.4.1}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Illustration of a thermodynamic map between systems.}}{55}{figure.4.2}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Inferring the phase transition of the 2D Ising model from limited sampling.}}{58}{figure.4.3}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces GCAA Tetraloop Conformational Landscape.}}{61}{figure.4.4}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces HIV-TAR RNA Conformational Landscape.}}{65}{figure.4.5}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Illustrative overview of RNAnneal.}}{69}{figure.5.1}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces RNAnneal evaluated on the riboswitch dataset.}}{73}{figure.5.2}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Conformational ensemble prediction with RNAnneal.}}{75}{figure.5.3}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Illustrative overview of RNAnneal.}}{71}{figure.5.1}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces RNAnneal evaluated on the riboswitch dataset.}}{75}{figure.5.2}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Conformational ensemble prediction with RNAnneal.}}{77}{figure.5.3}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Performance of DiffDock-Glide on the Posebusters dataset.}}{91}{figure.6.1}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Targeting the allosteric site of $\beta $-2 Adrenergic receptor with ligand KBY.}}{95}{figure.6.2}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Target-specific enrichment for the AF2-DUD-E virtual screening benchmark.}}{96}{figure.6.3}%
-\contentsline {figure}{\numberline {6.4}{\ignorespaces Analysis of poses sampled for IGF-1R}}{99}{figure.6.4}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Hyperparameter tuning for each model.}}{107}{figure.A.1}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Performance of DiffDock-Glide on the Posebusters dataset.}}{93}{figure.6.1}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Targeting the allosteric site of $\beta $-2 Adrenergic receptor with ligand KBY.}}{98}{figure.6.2}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Target-specific enrichment for the AF2-DUD-E virtual screening benchmark.}}{99}{figure.6.3}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Analysis of poses sampled for IGF-1R}}{101}{figure.6.4}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {C.1}{\ignorespaces Quality of linear fluctuation fit for the HIV-TAR RNA.}}{121}{figure.C.1}%
-\contentsline {figure}{\numberline {C.2}{\ignorespaces Convergence of melting temperature calculations.}}{122}{figure.C.2}%
-\contentsline {figure}{\numberline {C.3}{\ignorespaces Convergence towards equilibrium for GCAA.}}{123}{figure.C.3}%
-\contentsline {figure}{\numberline {C.4}{\ignorespaces Convergence towards equilibrium for HIV-TAR.}}{124}{figure.C.4}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Hyperparameter tuning for each model.}}{109}{figure.A.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {D.1}{\ignorespaces Riboswitch reference ERCs labeled with PDB accession code.}}{134}{figure.D.1}%
-\contentsline {figure}{\numberline {D.2}{\ignorespaces Interaction Network Fidelity (INF) by interaction type.}}{135}{figure.D.2}%
-\contentsline {figure}{\numberline {D.3}{\ignorespaces Evaluation of secondary structures predicted by EternaFold, LinearFold, and LinearAlifold.}}{136}{figure.D.3}%
-\contentsline {figure}{\numberline {D.4}{\ignorespaces Number of clusters vs d.}}{137}{figure.D.4}%
-\contentsline {figure}{\numberline {D.5}{\ignorespaces RMSD variation over a 100ns MD simulation launched from the reference conformation.}}{138}{figure.D.5}%
-\contentsline {figure}{\numberline {D.6}{\ignorespaces RMSD distribution of conformations sampled by RNAnneal.}}{139}{figure.D.6}%
-\contentsline {figure}{\numberline {D.7}{\ignorespaces RMSD distribution of conformations for the classification task.}}{140}{figure.D.7}%
-\contentsline {figure}{\numberline {D.8}{\ignorespaces INF variation over a 100ns MD simulation launched from the reference conformation.}}{141}{figure.D.8}%
-\contentsline {figure}{\numberline {D.9}{\ignorespaces INF distribution of conformations generated by RNAnneal.}}{142}{figure.D.9}%
-\contentsline {figure}{\numberline {D.10}{\ignorespaces INF distribution of conformations for the classification task.}}{143}{figure.D.10}%
-\contentsline {figure}{\numberline {D.11}{\ignorespaces Correlation between RMSD and INF for RNAnneal conformations.}}{144}{figure.D.11}%
-\contentsline {figure}{\numberline {D.12}{\ignorespaces AUAC and BEDROC for each combination of training features.}}{144}{figure.D.12}%
-\contentsline {figure}{\numberline {D.13}{\ignorespaces AUAC and BEDROC for RMSD classification criteria.}}{145}{figure.D.13}%
-\contentsline {figure}{\numberline {D.14}{\ignorespaces Variation in AUAC and BEDROC with scoring temperature.}}{145}{figure.D.14}%
-\contentsline {figure}{\numberline {D.15}{\ignorespaces Accumulation Curves.}}{146}{figure.D.15}%
-\contentsline {figure}{\numberline {D.16}{\ignorespaces Summary of Accumulation Curves}}{147}{figure.D.16}%
-\contentsline {figure}{\numberline {D.17}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 1.}}{148}{figure.D.17}%
-\contentsline {figure}{\numberline {D.18}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 2.}}{149}{figure.D.18}%
-\contentsline {figure}{\numberline {D.19}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 3.}}{150}{figure.D.19}%
-\contentsline {figure}{\numberline {D.20}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 4.}}{151}{figure.D.20}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {C.1}{\ignorespaces Quality of linear fluctuation fit for the HIV-TAR RNA.}}{123}{figure.C.1}%
+\contentsline {figure}{\numberline {C.2}{\ignorespaces Convergence of melting temperature calculations.}}{124}{figure.C.2}%
+\contentsline {figure}{\numberline {C.3}{\ignorespaces Convergence towards equilibrium for GCAA.}}{125}{figure.C.3}%
+\contentsline {figure}{\numberline {C.4}{\ignorespaces Convergence towards equilibrium for HIV-TAR.}}{126}{figure.C.4}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {D.1}{\ignorespaces Riboswitch reference ERCs labeled with PDB accession code.}}{136}{figure.D.1}%
+\contentsline {figure}{\numberline {D.2}{\ignorespaces Interaction Network Fidelity (INF) by interaction type.}}{137}{figure.D.2}%
+\contentsline {figure}{\numberline {D.3}{\ignorespaces Evaluation of secondary structures predicted by EternaFold, LinearFold, and LinearAlifold.}}{138}{figure.D.3}%
+\contentsline {figure}{\numberline {D.4}{\ignorespaces Number of clusters vs d.}}{139}{figure.D.4}%
+\contentsline {figure}{\numberline {D.5}{\ignorespaces RMSD variation over a 100ns MD simulation launched from the reference conformation.}}{140}{figure.D.5}%
+\contentsline {figure}{\numberline {D.6}{\ignorespaces RMSD distribution of conformations sampled by RNAnneal.}}{141}{figure.D.6}%
+\contentsline {figure}{\numberline {D.7}{\ignorespaces RMSD distribution of conformations for the classification task.}}{142}{figure.D.7}%
+\contentsline {figure}{\numberline {D.8}{\ignorespaces INF variation over a 100ns MD simulation launched from the reference conformation.}}{143}{figure.D.8}%
+\contentsline {figure}{\numberline {D.9}{\ignorespaces INF distribution of conformations generated by RNAnneal.}}{144}{figure.D.9}%
+\contentsline {figure}{\numberline {D.10}{\ignorespaces INF distribution of conformations for the classification task.}}{145}{figure.D.10}%
+\contentsline {figure}{\numberline {D.11}{\ignorespaces Correlation between RMSD and INF for RNAnneal conformations.}}{146}{figure.D.11}%
+\contentsline {figure}{\numberline {D.12}{\ignorespaces AUAC and BEDROC for each combination of training features.}}{146}{figure.D.12}%
+\contentsline {figure}{\numberline {D.13}{\ignorespaces AUAC and BEDROC for RMSD classification criteria.}}{147}{figure.D.13}%
+\contentsline {figure}{\numberline {D.14}{\ignorespaces Variation in AUAC and BEDROC with scoring temperature.}}{147}{figure.D.14}%
+\contentsline {figure}{\numberline {D.15}{\ignorespaces Accumulation Curves.}}{148}{figure.D.15}%
+\contentsline {figure}{\numberline {D.16}{\ignorespaces Summary of Accumulation Curves}}{149}{figure.D.16}%
+\contentsline {figure}{\numberline {D.17}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 1.}}{150}{figure.D.17}%
+\contentsline {figure}{\numberline {D.18}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 2.}}{151}{figure.D.18}%
+\contentsline {figure}{\numberline {D.19}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 3.}}{152}{figure.D.19}%
+\contentsline {figure}{\numberline {D.20}{\ignorespaces Conformational ensembles predicted by RNAnneal, set 4.}}{153}{figure.D.20}%
 \addvspace {10\p@ }
